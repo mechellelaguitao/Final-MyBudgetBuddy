@@ -5,76 +5,195 @@ from .service import CATEGORIES
 BURGUNDY = "#800020"
 WHITE = "#FFFFFF"
 BLACK = "#000000"
+BG = "#F5F5F5"
 
 
-def add_expenses(root, save):
+def button(parent, text, command, width=20):
+    tk.Button(
+        parent,
+        text=text,
+        command=command,
+        bg=WHITE,
+        fg=BLACK,
+        activebackground=WHITE,
+        activeforeground=BLACK,
+        width=width
+    ).pack(pady=10)
+
+
+def setup_style():
+    style = ttk.Style()
+
+    try:
+        style.theme_use("clam")
+    except tk.TclError:
+        pass
+
+    style.configure(
+        "Treeview",
+        background=WHITE,
+        foreground=BLACK,
+        fieldbackground=WHITE
+    )
+
+    style.configure(
+        "Treeview.Heading",
+        background=BURGUNDY,
+        foreground=WHITE
+    )
+
+
+def bulk_expense_form(root, save):
     win = tk.Toplevel(root)
     win.title("Add Expenses")
-    win.geometry("450x500")
-    win.configure(bg=WHITE)
+    win.geometry("750x500")
+    win.configure(bg=BG)
 
     tk.Label(
-        win, text="Add Expenses",
+        win,
+        text="Add Expenses",
         font=("Arial", 22, "bold"),
-        bg=WHITE, fg=BURGUNDY
-    ).pack(pady=20)
+        bg=BG,
+        fg=BURGUNDY
+    ).pack(pady=15)
+
+    tk.Label(
+        win,
+        text="Enter one or more expenses below.",
+        bg=BG,
+        fg=BLACK
+    ).pack()
+
+    box = tk.Frame(
+        win,
+        bg=WHITE,
+        padx=15,
+        pady=15
+    )
+    box.pack(
+        fill="both",
+        expand=True,
+        padx=20,
+        pady=10
+    )
+
+    headers = [
+        ("Category", 18),
+        ("Description", 25),
+        ("Amount", 15)
+    ]
+
+    for col, (text, width) in enumerate(headers):
+        tk.Label(
+            box,
+            text=text,
+            font=("Arial", 11, "bold"),
+            bg=WHITE,
+            fg=BLACK,
+            width=width
+        ).grid(
+            row=0,
+            column=col,
+            padx=5,
+            pady=5
+        )
 
     entries = {}
 
-    for category in CATEGORIES:
-        row = tk.Frame(win, bg=WHITE)
-        row.pack(pady=5)
-
+    for row, category in enumerate(CATEGORIES, 1):
         tk.Label(
-            row, text=category,
-            width=20, anchor="w",
-            bg=WHITE, fg=BLACK
-        ).pack(side="left")
-
-        entry = tk.Entry(
-            row, width=15,
-            bg=WHITE, fg=BLACK
+            box,
+            text=category,
+            bg=WHITE,
+            fg=BLACK,
+            width=18,
+            anchor="w"
+        ).grid(
+            row=row,
+            column=0,
+            padx=5,
+            pady=5
         )
-        entry.pack(side="left")
-        entries[category] = entry
+
+        desc = tk.Entry(
+            box,
+            width=25,
+            bg=WHITE,
+            fg=BLACK,
+            insertbackground=BLACK
+        )
+        desc.grid(
+            row=row,
+            column=1,
+            padx=5,
+            pady=5
+        )
+
+        amount = tk.Entry(
+            box,
+            width=15,
+            bg=WHITE,
+            fg=BLACK,
+            insertbackground=BLACK
+        )
+        amount.grid(
+            row=row,
+            column=2,
+            padx=5,
+            pady=5
+        )
+
+        entries[category] = (desc, amount)
 
     def submit():
-        expenses = []
+        data = []
 
         try:
-            for category, entry in entries.items():
-                amount = float(entry.get() or 0)
+            for category in CATEGORIES:
+                desc, amount = entries[category]
 
-                if amount < 0:
-                    raise ValueError
+                description = desc.get().strip()
+                value = amount.get().strip()
 
-                if amount > 0:
-                    expenses.append((category, amount))
+                if not description and not value:
+                    continue
 
-            if not expenses:
-                raise ValueError
+                if not description or not value:
+                    raise ValueError(
+                        f"Please complete the {category} information."
+                    )
 
-            save(expenses)
+                value = float(value)
+
+                if value <= 0:
+                    raise ValueError(
+                        f"Amount for {category} must be greater than zero."
+                    )
+
+                data.append(
+                    (description, category, value)
+                )
+
+            if not data:
+                raise ValueError(
+                    "Please enter at least one expense."
+                )
+
+            save(data)
             win.destroy()
 
-        except ValueError:
+        except ValueError as e:
             messagebox.showwarning(
                 "Expense",
-                "Please enter valid amounts."
+                str(e)
             )
 
-    tk.Button(
+    button(
         win,
-        text="Save Expenses",
-        command=submit,
-        bg=BURGUNDY,
-        fg=WHITE,
-        activebackground=BURGUNDY,
-        activeforeground=WHITE,
-        width=20,
-        relief="flat",
-        bd=0
-    ).pack(pady=20)
+        "Save All Expenses",
+        submit,
+        25
+    )
 
 
 def expense_form(root, title, save, expense=None):
@@ -84,62 +203,80 @@ def expense_form(root, title, save, expense=None):
     win.configure(bg=WHITE)
 
     tk.Label(
-        win, text=title,
+        win,
+        text=title,
         font=("Arial", 20, "bold"),
-        bg=WHITE, fg=BURGUNDY
+        bg=WHITE,
+        fg=BURGUNDY
     ).pack(pady=15)
 
-    tk.Label(
-        win, text="Description",
-        bg=WHITE, fg=BLACK
-    ).pack()
+    def field(text):
+        tk.Label(
+            win,
+            text=text,
+            bg=WHITE,
+            fg=BLACK
+        ).pack()
 
-    description = tk.Entry(
-        win, width=30,
-        bg=WHITE, fg=BLACK
-    )
-    description.pack(pady=5)
+        e = tk.Entry(
+            win,
+            width=30,
+            bg=WHITE,
+            fg=BLACK,
+            insertbackground=BLACK
+        )
+        e.pack(pady=5)
+
+        return e
+
+    description = field("Description")
 
     tk.Label(
-        win, text="Category",
-        bg=WHITE, fg=BLACK
+        win,
+        text="Category",
+        bg=WHITE,
+        fg=BLACK
     ).pack()
 
     category = tk.StringVar(
-        value=expense["category"] if expense else CATEGORIES[0]
+        value=expense["category"]
+        if expense
+        else CATEGORIES[0]
     )
 
     ttk.OptionMenu(
-        win, category, category.get(), *CATEGORIES
+        win,
+        category,
+        category.get(),
+        *CATEGORIES
     ).pack(pady=5)
 
-    tk.Label(
-        win, text="Amount",
-        bg=WHITE, fg=BLACK
-    ).pack()
-
-    amount = tk.Entry(
-        win, width=30,
-        bg=WHITE, fg=BLACK
-    )
-    amount.pack(pady=5)
+    amount = field("Amount")
 
     if expense:
-        description.insert(0, expense["description"])
-        amount.insert(0, expense["amount"])
+        description.insert(
+            0,
+            expense["description"]
+        )
+
+        amount.insert(
+            0,
+            expense["amount"]
+        )
 
     def submit():
         try:
             value = float(amount.get())
 
-            if not description.get() or value <= 0:
+            if not description.get().strip() or value <= 0:
                 raise ValueError
 
             save(
-                description.get(),
+                description.get().strip(),
                 category.get(),
                 value
             )
+
             win.destroy()
 
         except ValueError:
@@ -148,18 +285,11 @@ def expense_form(root, title, save, expense=None):
                 "Please enter valid information."
             )
 
-    tk.Button(
+    button(
         win,
-        text="Save",
-        command=submit,
-        bg=BURGUNDY,
-        fg=WHITE,
-        activebackground=BURGUNDY,
-        activeforeground=WHITE,
-        width=20,
-        relief="flat",
-        bd=0
-    ).pack(pady=15)
+        "Save",
+        submit
+    )
 
 
 def expense_list(root, expenses, title, action=None):
@@ -170,6 +300,8 @@ def expense_list(root, expenses, title, action=None):
         )
         return
 
+    setup_style()
+
     win = tk.Toplevel(root)
     win.title(title)
     win.geometry("650x450")
@@ -177,12 +309,25 @@ def expense_list(root, expenses, title, action=None):
 
     tree = ttk.Treeview(
         win,
-        columns=("No", "Description", "Category", "Amount"),
+        columns=(
+            "No",
+            "Description",
+            "Category",
+            "Amount"
+        ),
         show="headings"
     )
 
-    for col in ("No", "Description", "Category", "Amount"):
-        tree.heading(col, text=col)
+    for col in (
+        "No",
+        "Description",
+        "Category",
+        "Amount"
+    ):
+        tree.heading(
+            col,
+            text=col
+        )
 
     for i, e in enumerate(expenses, 1):
         tree.insert(
@@ -204,6 +349,7 @@ def expense_list(root, expenses, title, action=None):
     )
 
     if action:
+
         def select():
             selected = tree.selection()
 
@@ -214,19 +360,15 @@ def expense_list(root, expenses, title, action=None):
                 )
                 return
 
-            index = tree.index(selected[0])
+            index = tree.index(
+                selected[0]
+            )
+
             win.destroy()
             action(index)
 
-        tk.Button(
+        button(
             win,
-            text="SELECT",
-            command=select,
-            bg=BURGUNDY,
-            fg=WHITE,
-            activebackground=BURGUNDY,
-            activeforeground=WHITE,
-            width=20,
-            relief="flat",
-            bd=0
-        ).pack(pady=10)
+            "SELECT",
+            select
+        )

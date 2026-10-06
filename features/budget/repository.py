@@ -1,10 +1,10 @@
-def add(expenses, expense):
-    expenses.append(expense)
+def add(items, item):
+    items.append(item)
 
 
-def update(expenses, index, expense):
-    expenses[index] = expense
+def update(items, index, item):
+    items[index] = item
 
 
-def delete(expenses, index):
-    expenses.pop(index)
+def delete(items, index):
+    items.pop(index)

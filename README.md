@@ -1,770 +1,274 @@
-MyBudgetBuddy
+# MyBudgetBuddy
 
-Project Description
+## Project Description
 
-MyBudgetBuddy is a desktop monthly budget and expense management application developed in Python. It provides a graphical user interface (GUI) that allows users to create an account, log in, set a monthly budget, record expenses, view expenses, edit or delete expenses, monitor category spending, receive budget warnings, and view a monthly summary.
+MyBudgetBuddy is a simple budgeting and expense tracking system that is made using Python and Tkinter.
 
-The system addresses the need for a simple personal budgeting application that helps users monitor their spending against a planned monthly budget. Instead of manually calculating expenses and remaining funds, MyBudgetBuddy automatically calculates total expenses, remaining budget, category totals, and budget status.
+The system helps users manage their monthly budget and keep track of their expenses. Users can set a budget, add expenses, edit or delete expenses, and see how much money they have spent and how much is remaining.
 
-The application stores users, budget information, and expense records in a structured text file named monthly_expenses.txt.
+This system was created to help users easily monitor their spending and avoid going over their monthly budget.
 
-Project Objectives
+## Project Objectives
 
-The main objectives of MyBudgetBuddy are to:
+The main objectives of MyBudgetBuddy are:
 
-Provide a simple and user-friendly desktop budgeting application.
+- To create a simple budgeting system.
+- To help users track their expenses.
+- To allow users to set a monthly budget.
+- To show the total expenses and remaining budget.
+- To provide a simple monthly summary.
+- To practice Python and Object-Oriented Programming.
 
-Allow users to create accounts and log in securely through the application interface.
+## Features
 
-Allow users to set a monthly budget and category limits.
+### Login and Registration
 
-Record and manage individual expenses.
+Users can create an account, login, and logout.
 
-Automatically calculate total expenses and remaining budget.
+### Budget Period
 
-Categorize expenses for easier monitoring.
+Users can set their:
 
-Warn users when 80% or more of the budget has been used.
+- Month
+- Year
+- Total monthly budget
+- Budget for each category
 
-Identify when the user has reached or exceeded the monthly budget.
+### Add Expenses
 
-Provide a monthly summary of budget and category spending.
+Users can add multiple expenses by entering the description, category, and amount.
 
-Demonstrate basic software organization using models, repositories, services, views, and a main application class.
+### View Expenses
 
-Features
+Users can view all recorded expenses in a table.
 
-1. User Registration and Login
+### Edit Expense
 
-Users can create an account with a username and password. Existing users can log in through the login screen. The program also provides a default admin account when no user data exists.
+Users can edit an existing expense.
 
-2. Monthly Budget Setup
+### Delete Expense
 
-The user can enter:
+Users can delete an expense after confirming the deletion.
 
-Month
+### Dashboard
 
-Total monthly budget
+The dashboard shows:
 
-Budget amount for each expense category
+- Total Budget
+- Total Expenses
+- Remaining Budget
+- Budget Status
 
-The available categories are Food, Transportation, School, Bills, Personal, and Other.
+The budget status can be:
 
-3. Add Expense
+- Within Budget
+- Over Budget
 
-Users can add an expense by entering:
+### Monthly Summary
 
-Description
+The monthly summary shows:
 
-Category
+- Month and Year
+- Total Budget
+- Total Expenses
+- Remaining Budget
+- Budget for each category
+- Spending for each category
+- Overall budget status
 
-Amount
+## Technologies Used
 
-The application validates the amount before saving it.
+- **Programming Language:** Python
+- **GUI:** Tkinter
+- **Data Storage:** Text File
+- **Other Libraries:** tkinter and tkinter.ttk
 
-4. View Expenses
+No third-party Python packages are required.
 
-All recorded expenses can be displayed in a table containing the expense number, description, category, and amount.
+## Project Structure
 
-5. Edit Expense
-
-Users can select an existing expense and modify its description, category, or amount.
-
-6. Delete Expense
-
-Users can select an expense and delete it after confirming the deletion.
-
-7. Expense Categories
-
-The application calculates and displays the total amount spent in each category compared with the category budget.
-
-8. Budget Warning
-
-The application provides budget status messages:
-
-WITHIN BUDGET
-
-WARNING: 80% OF BUDGET USED
-
-BUDGET FULLY USED
-
-OVER BUDGET
-
-9. Dashboard
-
-The main dashboard displays:
-
-Total Budget
-
-Total Expenses
-
-Remaining Budget
-
-Current budget status
-
-Buttons for the application's major functions
-
-10. Monthly Summary
-
-The monthly summary displays the selected month, total budget, total expenses, remaining amount, and spending for each category.
-
-11. Logout
-
-Users can log out of the application. Before logging out, the application asks for confirmation and saves the current data.
-
-Technologies Used
-
-Technology
-
-Purpose
-
-Python
-
-Main programming language
-
-Tkinter
-
-GUI framework used to build windows, forms, buttons, labels, dialogs, and other interface components
-
-ttk
-
-Tkinter themed widgets, including the expense table and category selection menu
-
-Text File (monthly_expenses.txt)
-
-Persistent storage for users, budget information, category budgets, and expenses
-
-Python File I/O
-
-Reading and writing application data
-
-Python Lists and Dictionaries
-
-In-memory representation of users, budget information, categories, and expenses
-
-Git/GitHub (if used)
-
-Source-code version control and project sharing
-
-No external Python package is required by the program shown. Tkinter and the other imported modules used by the application are part of the standard Python installation on typical desktop Python distributions.
-
-Project Structure
-
-The program follows a feature-based structure with separate database, authentication, budget, and expense components.
-
+```text
 MyBudgetBuddy/
-│
+├── main.py
+├── monthly_expenses.txt
 ├── database/
-│   ├── database.py
-│   └── monthly_expenses.txt
-│
-├── features/
-│   ├── authentication/
-│   │   ├── model.py
-│   │   ├── repository.py
-│   │   ├── service.py
-│   │   └── view.py
-│   │
-│   ├── budget/
-│   │   ├── model.py
-│   │   ├── service.py
-│   │   └── view.py
-│   │
-│   └── expenses/
-│       ├── model.py
-│       ├── repository.py
-│       ├── service.py
-│       └── view.py
-│
-└── main.py
+│   ├── __init__.py
+│   └── database.py
+└── features/
+    ├── __init__.py
+    ├── authentication/
+    │   ├── __init__.py
+    │   ├── model.py
+    │   ├── repository.py
+    │   ├── service.py
+    │   └── view.py
+    ├── budget/
+    │   ├── __init__.py
+    │   ├── model.py
+    │   ├── service.py
+    │   └── view.py
+    ├── expenses/
+    │   ├── __init__.py
+    │   ├── model.py
+    │   ├── repository.py
+    │   ├── service.py
+    │   └── view.py
+    └── dashboard/
+        ├── __init__.py
+        └── view.py
+```
 
-Major Files and Folders
+### Main Files
 
-database/database.py
-Handles persistent storage. It loads users, budget information, and expenses from monthly_expenses.txt and saves the updated data back to the file.
+- `main.py` - Starts the application.
+- `monthly_expenses.txt` - Stores the users, budget, and expenses.
+- `database/database.py` - Loads and saves the data.
+- `authentication/` - Handles login and registration.
+- `budget/` - Handles the budget information.
+- `expenses/` - Handles adding, viewing, editing, and deleting expenses.
+- `dashboard/` - Contains the main dashboard and monthly summary.
 
-database/monthly_expenses.txt
-Acts as the application's persistent data store. It contains separate sections for users, budget information, and expenses.
+## Installation and Setup
 
-features/authentication/model.py
-Contains the function used to create a user object represented as a dictionary.
+### Requirements
 
-features/authentication/repository.py
-Provides data-access functions for retrieving users and registering new users.
+- Python 3.x
+- Tkinter
 
-features/authentication/service.py
-Contains authentication-related logic, including login and account creation.
+No additional packages are needed.
 
-features/authentication/view.py
-Contains the Tkinter login and registration screens.
+### Steps
 
-features/budget/model.py
-Creates budget data and provides basic expense list operations used by the budget feature.
+1. Install Python on your computer.
+2. Download or clone this project.
+3. Open the project folder in the terminal.
+4. Run:
 
-features/budget/service.py
-Contains budget-related calculations such as remaining budget and budget status.
-
-features/budget/view.py
-Provides the monthly budget setup GUI.
-
-features/expenses/model.py
-Creates expense objects and provides basic list operations for adding, updating, and deleting expenses.
-
-features/expenses/repository.py
-Provides the underlying list operations for expense records.
-
-features/expenses/service.py
-Contains expense-related business logic, including adding, editing, deleting, calculating totals, and calculating category totals.
-
-features/expenses/view.py
-Contains the graphical forms and expense table used for adding, editing, viewing, and selecting expenses.
-
-main.py
-Contains the main App class and connects the authentication, budget, expense, database, and GUI components. It also starts the Tkinter application.
-
-Installation and Setup
-
-Requirements
-
-Python 3.x
-
-Tkinter
-
-A desktop operating system that supports Tkinter
-
-The complete MyBudgetBuddy project folder
-
-Step 1: Install Python
-
-Download and install Python 3.x if it is not already installed.
-
-Verify the installation:
-
-python --version
-
-On some systems, use:
-
-python3 --version
-
-Step 2: Download or Clone the Project
-
-Place the complete project folder on your computer.
-
-If the project is stored in a Git repository:
-
-git clone <repository-url>
-cd MyBudgetBuddy
-
-Step 3: Verify the Project Structure
-
-Make sure the project contains the database, features, and main application files in the expected structure.
-
-Step 4: Run the Application
-
-From the project root directory, run:
-
+```bash
 python main.py
+```
 
-Or, depending on the system:
+5. The MyBudgetBuddy login screen should appear.
 
-python3 main.py
+## How to Use the System
 
-Step 5: First-Time Setup
+1. Open the application.
+2. Login using an existing account or create a new account.
+3. Set the month, year, and monthly budget.
+4. Enter the budget for each category.
+5. Use the dashboard to view the current budget.
+6. Select **Add Expenses** to record expenses.
+7. Select **View Expenses** to see your expenses.
+8. Select **Edit Expense** to change an expense.
+9. Select **Delete Expense** to remove an expense.
+10. Select **Monthly Summary** to see the budget and spending summary.
+11. Select **Logout** when finished.
 
-When the application starts:
+### Default Account
 
-Register a new account, or use the default account if no users exist.
+Username: `admin`  
+Password: `admin123`
 
-Log in.
+## OOP Implementation
 
-Enter the month.
+The main class used in the system is `App`.
 
-Enter the total monthly budget.
+The `App` class stores the users, budget, expenses, and contains methods for the dashboard operations.
 
-Enter category budgets.
+### Encapsulation
 
-Save the budget.
+Related data and functions are grouped inside classes and modules.
 
-Use the dashboard to manage expenses.
+### Inheritance
 
-Dependencies
+No custom inheritance is used in the project.
 
-The application uses Python's standard library:
+### Polymorphism
 
-tkinter
-tkinter.ttk
+No major custom polymorphism is used in the project.
 
-No pip install command is required for the libraries imported in the provided source code.
+## Database
 
-Note: On some Linux installations, Tkinter may need to be installed separately through the operating system's package manager.
+MyBudgetBuddy does not use a traditional database such as MySQL or SQLite.
 
-How to Use the System
+Instead, the system uses a text file called:
 
-1. Login
-
-Enter your username and password, then click Login.
-
-If you do not have an account, click Register and create one.
-
-2. Set Up the Budget
-
-After logging in for the first time, enter the month, total monthly budget, and category budgets.
-
-Click Save Budget.
-
-3. Add an Expense
-
-From the dashboard:
-
-Click Add Expense.
-
-Enter the expense description.
-
-Select the expense category.
-
-Enter the amount.
-
-Click Save.
-
-4. View Expenses
-
-Click View Expenses to see all recorded expenses in a table.
-
-5. Edit an Expense
-
-Click Edit Expense:
-
-Select an expense from the list.
-
-Change its information.
-
-Save the updated expense.
-
-6. Delete an Expense
-
-Click Delete Expense:
-
-Select an expense.
-
-Confirm the deletion.
-
-7. Check Category Spending
-
-Click Expense Categories to see how much has been spent in each category compared with the category budget.
-
-8. Check Budget Warning
-
-Click Budget Warning to see the current budget status.
-
-9. View Monthly Summary
-
-Click Monthly Summary to see the month, budget, expenses, remaining budget, and category totals.
-
-10. Logout
-
-Click Logout and confirm when prompted.
-
-OOP Implementation
-
-The project uses object-oriented programming primarily through the App class in main.py.
-
-Important Class
-
-App
-
-The App class controls the main application flow and stores the application's main state.
-
-Important attributes include:
-
-self.root – the main Tkinter window.
-
-self.users – loaded user records.
-
-self.budget – current budget information.
-
-self.expenses – recorded expense information.
-
-Important methods include:
-
-__init__() – initializes the application.
-
-login() – displays the login screen.
-
-after_login() – determines whether budget setup or the dashboard should be displayed.
-
-set_budget() – saves the configured budget.
-
-save() – writes current data to persistent storage.
-
-dashboard() – displays the main dashboard.
-
-add() – opens the add-expense form.
-
-view() – displays recorded expenses.
-
-edit() – opens the expense selection screen for editing.
-
-delete() – opens the expense selection screen for deletion.
-
-categories() – displays category totals.
-
-warning() – displays the current budget status.
-
-summary() – displays the monthly summary.
-
-logout() – saves data and returns to the login screen.
-
-Encapsulation
-
-Encapsulation is demonstrated by grouping the main application state and related operations inside the App class. For example, budget and expense data are stored as attributes such as self.budget and self.expenses, while operations on the application are implemented as methods of the same class.
-
-The feature modules also separate responsibilities into models, repositories, services, and views.
-
-Inheritance
-
-No custom inheritance hierarchy is explicitly implemented in the provided source code.
-
-The application does use Tkinter classes such as tk.Tk, tk.Frame, tk.Label, tk.Button, and ttk.Treeview, which are framework classes, but the project does not define its own subclasses of these widgets.
-
-Polymorphism
-
-No explicit custom polymorphism through method overriding is implemented in the provided source code. Different callback functions and methods are passed to Tkinter widgets as commands, allowing the GUI to invoke different behaviors depending on the selected operation.
-
-Database
-
-Database Type
-
-The project does not use a relational database such as MySQL, SQLite, or PostgreSQL.
-
-Instead, it uses a structured text file:
-
+```text
 monthly_expenses.txt
+```
 
-The file is divided into sections:
+The file contains the following sections:
 
+```text
 [USERS]
-
 [BUDGET]
-
 [EXPENSES]
+```
 
-The database module reads these sections and converts the stored values into Python lists and dictionaries for use by the application.
+### Data Stored
 
-Data Structure
+- **Users** - Stores usernames and passwords.
+- **Budget** - Stores the current month, year, total budget, and category budgets.
+- **Expenses** - Stores expense descriptions, categories, and amounts.
 
-Users
+### CRUD Operations
 
-Each user contains:
+The system supports:
 
-username
-password
+- **Create** - Create accounts and add expenses.
+- **Read** - View saved users, budget, and expenses.
+- **Update** - Update the budget and edit expenses.
+- **Delete** - Delete expenses.
 
-Budget
+The system does not have a separate search feature.
 
-The budget contains:
+## Screenshots
 
-month
-total
-categories
+Screenshots can be added here after taking screenshots of the system.
 
-Each category stores its corresponding budget amount.
+Example:
 
-Expenses
+```markdown
+![Login Screen](screenshots/login.png)
 
-Each expense contains:
+![Budget Period](screenshots/budget-period.png)
 
-description
-category
-amount
+![Dashboard](screenshots/dashboard.png)
 
-Important Data Sections
+![Add Expenses](screenshots/add-expenses.png)
 
-Section
+![View Expenses](screenshots/view-expenses.png)
 
-Purpose
+![Monthly Summary](screenshots/monthly-summary.png)
+```
 
-[USERS]
+## Testing
 
-Stores registered usernames and passwords
+The following features were tested:
 
-[BUDGET]
+| Feature | Test | Expected Result | Actual Result |
+|---|---|---|---|
+| Login | Correct username and password | User can login | Passed |
+| Login | Wrong username or password | Error message appears | Passed |
+| Register | Create new account | Account is created | Passed |
+| Budget | Enter valid budget | Budget is saved | Passed |
+| Add Expense | Add an expense | Expense is added | Passed |
+| View Expense | Open expense list | Expenses are displayed | Passed |
+| Edit Expense | Edit an expense | Expense is updated | Passed |
+| Delete Expense | Delete an expense | Expense is removed | Passed |
+| Summary | Open monthly summary | Summary is displayed | Passed |
 
-Stores the selected month, total budget, and category budgets
+## Known Issues / Limitations
 
-[EXPENSES]
+- Expenses are stored in one list.
+- Changing the budget period does not create a separate expense list for each month.
+- There is no monthly expense history.
+- There is no separate search function.
+- Passwords are stored in a text file and are not encrypted.
+- The system does not use a traditional database.
+- The system does not have charts or graphs.
 
-Stores expense descriptions, categories, and amounts
+## Author
 
-CRUD and Search Operations
-
-Create
-
-The system creates:
-
-New user accounts
-
-A monthly budget
-
-New expense records
-
-Read
-
-The system reads:
-
-User accounts
-
-Budget information
-
-Expense records
-
-Category totals
-
-Monthly summary information
-
-Update
-
-The system updates:
-
-Budget data
-
-Existing expense records
-
-Delete
-
-The system deletes:
-
-Selected expense records
-
-Search / Selection
-
-The system does not implement a separate text-based search feature. Instead, users select an expense from the displayed expense table when editing or deleting a record.
-
-Screenshots
-
-The following screenshots should be included in the final project documentation. Replace the placeholders below with screenshots captured from the working application.
-
-Screenshot 1 – Login Screen
-
-Description: Shows the MyBudgetBuddy login interface with username and password fields, Login button, and Register button.
-
-[Insert screenshot of the Login Screen here]
-
-Screenshot 2 – Registration Screen
-
-Description: Shows the Create Account form where a user enters a username, password, and confirmation password.
-
-[Insert screenshot of the Registration Screen here]
-
-Screenshot 3 – Monthly Budget Setup
-
-Description: Shows the form for entering the month, total monthly budget, and category budget amounts.
-
-[Insert screenshot of the Monthly Budget Setup here]
-
-Screenshot 4 – Dashboard
-
-Description: Shows the main dashboard containing the total budget, expenses, remaining amount, budget status, and application buttons.
-
-[Insert screenshot of the Dashboard here]
-
-Screenshot 5 – Add Expense
-
-Description: Shows the form used to enter an expense description, category, and amount.
-
-[Insert screenshot of the Add Expense form here]
-
-Screenshot 6 – Expense List
-
-Description: Shows the table containing recorded expenses, including their description, category, and amount.
-
-[Insert screenshot of the Expense List here]
-
-Screenshot 7 – Monthly Summary
-
-Description: Shows the monthly summary containing the budget, total expenses, remaining amount, and category spending.
-
-[Insert screenshot of the Monthly Summary here]
-
-Testing
-
-The following test cases can be used to verify the major functions of MyBudgetBuddy.
-
-Test Case
-
-Action
-
-Expected Result
-
-Actual Result
-
-Login with valid credentials
-
-Enter a registered username and correct password
-
-User is logged in and proceeds to budget setup or dashboard
-
-Passed – valid credentials are accepted
-
-Login with invalid credentials
-
-Enter an incorrect username or password
-
-Error message is displayed
-
-Passed – invalid credentials display an error
-
-Register account
-
-Enter a new username and matching passwords
-
-Account is created successfully
-
-Passed – new account is saved
-
-Register duplicate username
-
-Use an existing username
-
-System reports that the username already exists
-
-Passed – duplicate username is rejected
-
-Register mismatched passwords
-
-Enter different password and confirmation values
-
-Warning message is displayed
-
-Passed – registration is rejected
-
-Set valid budget
-
-Enter a valid month and positive budget values
-
-Budget is saved and dashboard is displayed
-
-Passed – valid budget is accepted
-
-Add valid expense
-
-Enter a description, category, and positive amount
-
-Expense is added and dashboard totals are updated
-
-Passed – expense is saved
-
-Add invalid expense
-
-Enter an invalid or negative amount
-
-Warning message is displayed
-
-Passed – invalid amount is rejected
-
-View expenses
-
-Click View Expenses
-
-Existing expenses appear in a table
-
-Passed – expenses are displayed
-
-Edit expense
-
-Select an expense and change its details
-
-Selected expense is updated
-
-Passed – expense is updated
-
-Delete expense
-
-Select an expense and confirm deletion
-
-Selected expense is removed
-
-Passed – expense is deleted
-
-Budget warning below 80%
-
-Keep spending below 80% of budget
-
-Status shows WITHIN BUDGET
-
-Passed
-
-Budget warning at/above 80%
-
-Reach at least 80% of budget
-
-Status shows WARNING: 80% OF BUDGET USED unless the budget is fully used or exceeded
-
-Passed
-
-Fully used budget
-
-Make total expenses equal to the budget
-
-Status shows BUDGET FULLY USED
-
-Passed
-
-Exceed budget
-
-Make total expenses greater than the budget
-
-Status shows OVER BUDGET
-
-Passed
-
-Monthly summary
-
-Click Monthly Summary
-
-Current budget, expenses, remaining amount, and category totals are shown
-
-Passed
-
-Logout
-
-Click Logout and confirm
-
-User returns to the login screen
-
-Passed
-
-Testing note: The “Actual Result” entries above are based on the implemented program logic. They should be replaced with the exact results observed during your own live testing if your instructor requires evidence from an actual test run.
-
-Known Issues / Limitations
-
-Text-file storage instead of a relational database
-The project stores data in monthly_expenses.txt rather than SQLite, MySQL, or another database management system.
-
-Passwords are stored as plain text
-Passwords are written directly to the data file. A production application should hash passwords before storage.
-
-No dedicated search function
-The application allows users to view and select expenses, but there is no separate search field for finding expenses by description or category.
-
-Single shared budget data set
-The current storage structure does not associate budget and expense records with a specific logged-in username. Therefore, it does not implement fully separated personal data for multiple users.
-
-No password recovery
-The application does not provide a forgotten-password or account-recovery feature.
-
-No export/report feature
-The application does not currently export reports to CSV, PDF, or other formats.
-
-No graphical charts
-Category totals are displayed as text rather than as graphs or charts.
-
-Input validation is basic
-The application validates important numeric fields, but more advanced validation could be added for usernames, passwords, duplicate data, and file corruption.
-
-No database transaction or concurrency handling
-Because the application uses a text file, it does not provide the transaction management and concurrent-user handling normally available in a database system.
-
-Author
-
-Name: Mechelle Laguitao
-Section: CS26(3581) BSCS- 2
+**Name:** Mechelle Laguitao  
+**Section:** CS26(3581) BSCS-2

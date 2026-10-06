@@ -1,23 +1,40 @@
 import tkinter as tk
 from tkinter import messagebox
-
 from .service import login, create_account
 
-
 BURGUNDY = "#800020"
-BG = "#F5F5F5"
 WHITE = "#FFFFFF"
-DARK = "#000000"
+BLACK = "#000000"
+BG = "#F5F5F5"
 
 
 def show_login(root, success):
-
     root.configure(bg=BG)
-    root.title("MyBudgetBuddy")
 
     def clear():
         for w in root.winfo_children():
             w.destroy()
+
+    def label(parent, text, size=11, color=BLACK):
+        tk.Label(
+            parent,
+            text=text,
+            font=("Arial", size, "bold" if size > 20 else "normal"),
+            bg=parent.cget("bg"),
+            fg=color
+        ).pack(pady=5)
+
+    def button(parent, text, command):
+        tk.Button(
+            parent,
+            text=text,
+            command=command,
+            width=20,
+            bg=WHITE,
+            fg=BLACK,
+            activebackground=WHITE,
+            activeforeground=BLACK
+        ).pack(pady=5)
 
     def login_page():
         clear()
@@ -30,40 +47,25 @@ def show_login(root, success):
         )
         box.pack(expand=True)
 
-        tk.Label(
-            box,
-            text="MyBudgetBuddy",
-            font=("Arial", 24, "bold"),
-            bg=WHITE,
-            fg=BURGUNDY
-        ).pack(pady=10)
-
-        tk.Label(
-            box,
-            text="Username",
-            bg=WHITE,
-            fg=DARK
-        ).pack()
+        label(box, "MyBudgetBuddy", 24, BURGUNDY)
+        label(box, "Username")
 
         username = tk.Entry(
             box,
-            fg=DARK,
-            bg=WHITE
+            bg=WHITE,
+            fg=BLACK,
+            insertbackground=BLACK
         )
         username.pack(pady=5)
 
-        tk.Label(
-            box,
-            text="Password",
-            bg=WHITE,
-            fg=DARK
-        ).pack()
+        label(box, "Password")
 
         password = tk.Entry(
             box,
             show="*",
-            fg=DARK,
-            bg=WHITE
+            bg=WHITE,
+            fg=BLACK,
+            insertbackground=BLACK
         )
         password.pack(pady=5)
 
@@ -76,23 +78,8 @@ def show_login(root, success):
                     "Invalid username or password."
                 )
 
-        tk.Button(
-            box,
-            text="Login",
-            command=submit,
-            bg=BURGUNDY,
-            fg=WHITE,
-            width=20
-        ).pack(pady=10)
-
-        tk.Button(
-            box,
-            text="Register",
-            command=register_page,
-            bg=WHITE,
-            fg=BURGUNDY,
-            width=20
-        ).pack()
+        button(box, "Login", submit)
+        button(box, "Register", register_page)
 
     def register_page():
         clear()
@@ -105,13 +92,7 @@ def show_login(root, success):
         )
         box.pack(expand=True)
 
-        tk.Label(
-            box,
-            text="Create Account",
-            font=("Arial", 22, "bold"),
-            bg=WHITE,
-            fg=BURGUNDY
-        ).pack(pady=10)
+        label(box, "Create Account", 22, BURGUNDY)
 
         entries = []
 
@@ -120,22 +101,17 @@ def show_login(root, success):
             "Password",
             "Confirm Password"
         ):
-            tk.Label(
-                box,
-                text=text,
-                bg=WHITE,
-                fg=DARK
-            ).pack()
+            label(box, text)
 
-            entry = tk.Entry(
+            e = tk.Entry(
                 box,
-                fg=DARK,
                 bg=WHITE,
+                fg=BLACK,
+                insertbackground=BLACK,
                 show="*" if "Password" in text else ""
             )
-            entry.pack(pady=5)
-
-            entries.append(entry)
+            e.pack(pady=5)
+            entries.append(e)
 
         def submit():
             username, password, confirm = [
@@ -167,27 +143,7 @@ def show_login(root, success):
                     "Username already exists."
                 )
 
-        tk.Button(
-            box,
-            text="Create Account",
-            command=submit,
-            bg=BURGUNDY,
-            fg=WHITE,
-            width=20
-        ).pack(pady=10)
-
-        tk.Button(
-            box,
-            text="Back to Login",
-            command=login_page,
-            bg=WHITE,
-            fg=BURGUNDY,
-            width=20
-        ).pack()
+        button(box, "Create Account", submit)
+        button(box, "Back to Login", login_page)
 
     login_page()
-
-
-
-
-

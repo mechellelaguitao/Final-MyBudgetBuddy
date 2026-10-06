@@ -2,13 +2,12 @@ FILE = "monthly_expenses.txt"
 
 
 def load_data():
-    users = []
-    expenses = []
+    users, expenses = [], []
     budget = {"month": "", "total": 0, "categories": {}}
     section = ""
 
     try:
-        with open(FILE, "r") as f:
+        with open(FILE) as f:
             for line in f:
                 line = line.strip()
 
@@ -43,10 +42,7 @@ def load_data():
         pass
 
     if not users:
-        users.append({
-            "username": "admin",
-            "password": "admin123"
-        })
+        users.append({"username": "admin", "password": "admin123"})
 
     return users, budget, expenses
 

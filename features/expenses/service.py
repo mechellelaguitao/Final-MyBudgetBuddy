@@ -2,12 +2,8 @@ from .model import create_expense
 from .repository import add, update, delete
 
 CATEGORIES = [
-    "Food",
-    "Transportation",
-    "School",
-    "Bills",
-    "Personal",
-    "Other"
+    "Food", "Transportation", "School",
+    "Bills", "Personal", "Other"
 ]
 
 
@@ -15,10 +11,14 @@ def add_expense(expenses, description, category, amount):
     add(expenses, create_expense(description, category, amount))
 
 
+def add_multiple_expenses(expenses, expense_list):
+    for description, category, amount in expense_list:
+        add_expense(expenses, description, category, amount)
+
+
 def edit_expense(expenses, index, description, category, amount):
     update(
-        expenses,
-        index,
+        expenses, index,
         create_expense(description, category, amount)
     )
 
