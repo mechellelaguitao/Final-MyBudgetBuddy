@@ -1,0 +1,24 @@
+[USERS]
+admin|admin123
+
+[BUDGET]
+month|October 2026
+total|7500.0
+category|Food|2500.0
+category|Transportation|1500.0
+category|School|500.0
+category|Bills|800.0
+category|Personal|700.0
+category|Other|1000.0
+
+[EXPENSES]
+Lunch|Food|65.0
+Fare|Transportation|50.0
+Ballpen|School|40.0
+Tissue|Personal|50.0
+Lunch and Dinner|Food|150.0
+Fare|Transportation|60.0
+Supplies|School|100.0
+Utilities and Electricity|Bills|750.0
+Skincare Essentials|Personal|400.0
+Medical Check-up|Other|600.0
