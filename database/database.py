@@ -1,69 +1,142 @@
-FILE = "monthly_expenses.txt"
+import sqlite3
+
+FILE = "mybudgetbuddy.db"
+
+
+def connect():
+    return sqlite3.connect(FILE)
+
+
+def create_tables():
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS budget (
+            id INTEGER PRIMARY KEY,
+            month TEXT,
+            total REAL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS category_budgets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            category TEXT NOT NULL,
+            amount REAL NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS expenses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            description TEXT NOT NULL,
+            category TEXT NOT NULL,
+            amount REAL NOT NULL
+        )
+    """)
+
+    conn.commit()
+    conn.close()
 
 
 def load_data():
-    users, expenses = [], []
-    budget = {"month": "", "total": 0, "categories": {}}
-    section = ""
+    create_tables()
 
-    try:
-        with open(FILE) as f:
-            for line in f:
-                line = line.strip()
+    conn = connect()
+    cursor = conn.cursor()
 
-                if line.startswith("["):
-                    section = line[1:-1].lower()
-                    continue
+    users = []
+    expenses = []
+    budget = {
+        "month": "",
+        "total": 0,
+        "categories": {}
+    }
 
-                if "|" not in line:
-                    continue
+    cursor.execute("SELECT username, password FROM users")
 
-                x = line.split("|")
+    for username, password in cursor.fetchall():
+        users.append({
+            "username": username,
+            "password": password
+        })
 
-                if section == "users" and len(x) == 2:
-                    users.append({"username": x[0], "password": x[1]})
+    cursor.execute("SELECT month, total FROM budget WHERE id = 1")
+    row = cursor.fetchone()
 
-                elif section == "budget":
-                    if x[0] == "month":
-                        budget["month"] = x[1]
-                    elif x[0] == "total":
-                        budget["total"] = float(x[1])
-                    elif x[0] == "category":
-                        budget["categories"][x[1]] = float(x[2])
+    if row:
+        budget["month"] = row[0]
+        budget["total"] = row[1]
 
-                elif section == "expenses" and len(x) == 3:
-                    expenses.append({
-                        "description": x[0],
-                        "category": x[1],
-                        "amount": float(x[2])
-                    })
+    cursor.execute("SELECT category, amount FROM category_budgets")
 
-    except FileNotFoundError:
-        pass
+    for category, amount in cursor.fetchall():
+        budget["categories"][category] = amount
+
+    cursor.execute("SELECT description, category, amount FROM expenses")
+
+    for description, category, amount in cursor.fetchall():
+        expenses.append({
+            "description": description,
+            "category": category,
+            "amount": amount
+        })
+
+    conn.close()
 
     if not users:
-        users.append({"username": "admin", "password": "admin123"})
+        users.append({
+            "username": "admin",
+            "password": "admin123"
+        })
+
+        save_data(users, budget, expenses)
 
     return users, budget, expenses
 
 
 def save_data(users, budget, expenses):
-    with open(FILE, "w") as f:
-        f.write("[USERS]\n")
+    create_tables()
 
-        for u in users:
-            f.write(f"{u['username']}|{u['password']}\n")
+    conn = connect()
+    cursor = conn.cursor()
 
-        f.write("\n[BUDGET]\n")
-        f.write(f"month|{budget['month']}\n")
-        f.write(f"total|{budget['total']}\n")
+    cursor.execute("DELETE FROM users")
+    cursor.execute("DELETE FROM budget")
+    cursor.execute("DELETE FROM category_budgets")
+    cursor.execute("DELETE FROM expenses")
 
-        for c, amount in budget["categories"].items():
-            f.write(f"category|{c}|{amount}\n")
+    for user in users:
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            (user["username"], user["password"])
+        )
 
-        f.write("\n[EXPENSES]\n")
+    cursor.execute(
+        "INSERT INTO budget (id, month, total) VALUES (1, ?, ?)",
+        (budget["month"], budget["total"])
+    )
 
-        for e in expenses:
-            f.write(
-                f"{e['description']}|{e['category']}|{e['amount']}\n"
-            )
+    for category, amount in budget["categories"].items():
+        cursor.execute(
+            "INSERT INTO category_budgets (category, amount) VALUES (?, ?)",
+            (category, amount)
+        )
+
+    for expense in expenses:
+        cursor.execute(
+            "INSERT INTO expenses (description, category, amount) VALUES (?, ?, ?)",
+            (expense["description"], expense["category"], expense["amount"])
+        )
+
+    conn.commit()
+    conn.close()

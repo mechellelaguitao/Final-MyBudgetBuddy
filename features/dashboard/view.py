@@ -1,179 +1,228 @@
-import tkinter as tk
-from tkinter import messagebox
-
-from features.budget.service import remaining, status
+from PyQt6.QtWidgets import QMainWindow,QWidget,QVBoxLayout,QHBoxLayout,QGridLayout,QLabel,QPushButton,QFrame,QMessageBox,QDialog
+from PyQt6.QtCore import Qt
+from database.database import save_data
+from features.authentication.view import show_login
 from features.budget.view import setup_budget
-from features.expenses.service import CATEGORIES, add_multiple_expenses, edit_expense, delete_expense, total
-from features.expenses.view import bulk_expense_form, expense_form, expense_list
+from features.budget.service import remaining,status
+from features.expenses.service import CATEGORIES,add_expense,total,category_totals
+from features.expenses.view import ExpenseFormDialog,ExpenseListDialog
 
-BURGUNDY = "#800020"
-WHITE = "#FFFFFF"
-BLACK = "#000000"
-BG = "#F5F5F5"
-RED = "#B42318"
+BURGUNDY="#900020"; BG="#F5F5F5"; WHITE="#FFFFFF"; BLACK="#000000"; RED="#B42318"
 
 
-class App:
+class App(QMainWindow):
 
-    def __init__(self, root, users, budget, expenses, save, login):
-        self.root = root
-        self.users = users
-        self.budget = budget
-        self.expenses = expenses
-        self.save_data = save
-        self.login = login
-        self.dashboard()
+    def __init__(self,users,budget,expenses):
+        super().__init__()
+        self.users=users; self.budget=budget; self.expenses=expenses
+        self.setWindowTitle("MyBudgetBuddy"); self.setFixedSize(1000,700)
+        self.login()
 
     def clear(self):
-        for widget in self.root.winfo_children(): widget.destroy()
+        old=self.takeCentralWidget()
+        if old: old.deleteLater()
+
+    def login(self):
+        show_login(self,self.after_login)
+
+    def after_login(self):
+        if self.budget["month"]:
+            self.dashboard()
+        else:
+            setup_budget(self,self.set_budget,CATEGORIES)
+
+    def set_budget(self,budget):
+        self.budget=budget; self.save(); self.dashboard()
 
     def save(self):
-        self.save_data()
-
-    def button(self, parent, text, command, width=20, pady=5):
-        return tk.Button(parent, text=text, command=command, bg=WHITE, fg=BLACK,
-                         activebackground=WHITE, activeforeground=BLACK,
-                         width=width, pady=pady)
-
-    def label(self, parent, text, size=11, color=BLACK):
-        tk.Label(parent, text=text, font=("Arial", size, "bold" if size > 15 else "normal"),
-                 bg=parent.cget("bg"), fg=color).pack(pady=5)
+        save_data(self.users,self.budget,self.expenses)
 
     def dashboard(self):
+
         self.clear()
-        self.root.configure(bg=BG)
 
-        header = tk.Frame(self.root, bg=BURGUNDY)
-        header.pack(fill="x")
+        page=QWidget(); page.setStyleSheet(f"background:{BG};color:{BLACK};")
+        main=QVBoxLayout(page); main.setContentsMargins(0,0,0,0); main.setSpacing(8)
 
-        tk.Label(header, text="MyBudgetBuddy", font=("Arial", 24, "bold"),
-                 bg=BURGUNDY, fg=WHITE).pack(side="left", padx=25, pady=18)
+        header=QFrame(); header.setFixedHeight(115); header.setStyleSheet(f"background:{BURGUNDY};")
+        header_layout=QHBoxLayout(header); header_layout.setContentsMargins(35,0,30,0)
 
-        self.button(header, "Logout", self.logout).pack(side="right", padx=20)
+        title=QLabel("MyBudgetBuddy"); title.setStyleSheet(f"color:{WHITE};font-size:32px;font-weight:bold;")
+        header_layout.addWidget(title); header_layout.addStretch()
 
-        spent = total(self.expenses)
-        left = remaining(self.budget, spent)
+        logout=QPushButton("Log out"); logout.setFixedSize(250,55)
+        logout.setStyleSheet(f"""
+        QPushButton {{
+            background:{WHITE};
+            color:{BLACK};
+            border:3px solid {BLACK};
+            font-size:16px;
+        }}
+        QPushButton:hover {{ background:#EEEEEE;color:{BLACK}; }}
+        """)
+        logout.clicked.connect(self.logout); header_layout.addWidget(logout); main.addWidget(header)
 
-        self.label(self.root, f"{self.budget['month']} Dashboard", 22)
+        heading=QLabel(f"{self.budget['month']} Dashboard"); heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        heading.setStyleSheet(f"color:{BLACK};font-size:38px;font-weight:bold;padding:8px;"); main.addWidget(heading)
 
-        cards = tk.Frame(self.root, bg=BG)
-        cards.pack()
+        spent=total(self.expenses); left=remaining(self.budget,spent)
 
-        for i, (name, value) in enumerate([("Budget", self.budget["total"]), ("Expenses", spent), ("Remaining", left)]):
-            self.card(cards, name, value, i)
+        cards=QHBoxLayout(); cards.setSpacing(25)
+        cards.addWidget(self.card("Budget",self.budget["total"]))
+        cards.addWidget(self.card("Expenses",spent))
+        cards.addWidget(self.card("Remaining",left))
+        main.addLayout(cards)
 
-        tk.Label(self.root, text=status(self.budget, spent), font=("Arial", 14, "bold"),
-                 bg=BG, fg=RED if left < 0 else BURGUNDY).pack(pady=15)
+        stat=QLabel(status(self.budget,spent)); stat.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        stat.setStyleSheet(f"color:{RED if left<0 else BURGUNDY};font-size:24px;font-weight:bold;padding:8px;"); main.addWidget(stat)
 
-        menu = tk.Frame(self.root, bg=BG)
-        menu.pack()
+        menu=QGridLayout(); menu.setHorizontalSpacing(18); menu.setVerticalSpacing(12)
 
-        buttons = [
-            ("Add Expenses", self.add),
-            ("View Expenses", self.view),
-            ("Edit Expense", self.edit),
-            ("Delete Expense", self.delete),
-            ("Budget Period", self.set_period),
-            ("Monthly Summary", self.summary)
+        buttons=[
+            ("Add Expenses",self.add),
+            ("View Expenses",self.view),
+            ("Edit Expense",self.edit),
+            ("Delete Expense",self.delete),
+            ("Budget Period",self.budget_period),
+            ("Monthly Summary",self.summary)
         ]
 
-        for i, (text, command) in enumerate(buttons): self.button(menu, text, command, width=22, pady=7).grid(row=i // 2, column=i % 2, padx=6, pady=5)
+        for i,(text,command) in enumerate(buttons):
+            button=QPushButton(text); button.setFixedSize(320,55)
+            button.setStyleSheet(f"""
+            QPushButton {{
+                background:{WHITE};
+                color:{BLACK};
+                border:3px solid {BLACK};
+                font-size:16px;
+            }}
+            QPushButton:hover {{ background:#EEEEEE;color:{BLACK}; }}
+            """)
+            button.clicked.connect(command); menu.addWidget(button,i//2,i%2)
 
-    def card(self, parent, title, value, column):
-        box = tk.Frame(parent, bg=WHITE, width=200, height=90, relief="solid", bd=1)
-        box.grid(row=0, column=column, padx=10)
-        box.pack_propagate(False)
+        menu_widget=QWidget(); menu_widget.setLayout(menu)
+        main.addWidget(menu_widget,alignment=Qt.AlignmentFlag.AlignCenter); main.addStretch()
+        self.setCentralWidget(page)
 
-        tk.Label(box, text=title, bg=WHITE, fg=BLACK).pack(pady=10)
-        tk.Label(box, text=f"₱{value:,.2f}", font=("Arial", 15, "bold"),
-                 bg=WHITE, fg=BURGUNDY).pack()
+    def card(self,title,value):
+
+        box=QFrame(); box.setFixedSize(270,115)
+        box.setStyleSheet(f"background:{WHITE};color:{BLACK};border:1px solid {BLACK};")
+        layout=QVBoxLayout(box)
+
+        label=QLabel(title); label.setAlignment(Qt.AlignmentFlag.AlignCenter); label.setStyleSheet(f"color:{BLACK};font-size:17px;"); layout.addWidget(label)
+
+        amount=QLabel(f"₱{value:,.2f}"); amount.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        amount.setStyleSheet(f"color:{BURGUNDY};font-size:25px;font-weight:bold;"); layout.addWidget(amount)
+
+        return box
 
     def add(self):
-        bulk_expense_form(self.root, self.add_save)
 
-    def add_save(self, expenses):
-        add_multiple_expenses(self.expenses, expenses)
-        self.save()
-        self.dashboard()
+        dialog=ExpenseFormDialog(self,"Add Expenses")
+
+        if dialog.exec()==QDialog.DialogCode.Accepted:
+
+            for description,category,amount in dialog.values():
+                add_expense(self.expenses,description,category,amount)
+
+            self.save(); self.dashboard()
 
     def view(self):
-        expense_list(self.root, self.expenses, "View Expenses")
+
+        dialog=ExpenseListDialog(self,self.expenses,"View Expenses",mode="view")
+        dialog.exec()
 
     def edit(self):
-        expense_list(self.root, self.expenses, "Edit Expense", self.edit_selected)
 
-    def edit_selected(self, index):
-        expense_form(self.root, "Edit Expense",
-                     lambda d, c, a: self.edit_save(index, d, c, a),
-                     self.expenses[index])
+        dialog=ExpenseListDialog(self,self.expenses,"Edit Expense",mode="edit")
 
-    def edit_save(self, index, description, category, amount):
-        edit_expense(self.expenses, index, description, category, amount)
-        self.save()
-        self.dashboard()
+        if dialog.exec()==QDialog.DialogCode.Accepted:
+            self.expenses=dialog.result_expenses()
+            self.save(); self.dashboard()
 
     def delete(self):
-        expense_list(self.root, self.expenses, "Delete Expense", self.delete_selected)
 
-    def delete_selected(self, index):
-        if messagebox.askyesno("Delete", "Do you want to delete this expense?"):
-            delete_expense(self.expenses, index)
-            self.save()
-            self.dashboard()
+        dialog=ExpenseListDialog(self,self.expenses,"Delete Expense",mode="delete")
 
-    def set_period(self):
-        setup_budget(self.root, self.set_budget, CATEGORIES)
+        if dialog.exec()==QDialog.DialogCode.Accepted:
+            self.expenses=dialog.result_expenses()
+            self.save(); self.dashboard()
 
-    def set_budget(self, budget):
-        self.budget.clear()
-        self.budget.update(budget)
-        self.save()
-        self.dashboard()
+    def budget_period(self):
+        setup_budget(self,self.set_budget,CATEGORIES,self.budget)
 
     def summary(self):
-        spent = total(self.expenses)
-        budget = self.budget["total"]
-        left = budget - spent
 
-        win = tk.Toplevel(self.root)
-        win.title("Monthly Summary")
-        win.geometry("600x550")
-        win.configure(bg=WHITE)
+        spent=total(self.expenses); left=remaining(self.budget,spent); data=category_totals(self.expenses)
 
-        tk.Label(win, text="Monthly Summary", font=("Arial", 20, "bold"),
-                 bg=WHITE, fg=BURGUNDY).pack(pady=15)
+        dialog=QDialog(self); dialog.setWindowTitle("Monthly Summary"); dialog.setFixedSize(700,650)
+        dialog.setStyleSheet(f"background:{WHITE};color:{BLACK};")
 
-        tk.Label(win, text=f"Month: {self.budget['month']}\n"
-                           f"Total Budget: ₱{budget:,.2f}\n"
-                           f"Total Expenses: ₱{spent:,.2f}\n"
-                           f"Remaining: ₱{left:,.2f}",
-                 font=("Arial", 12), bg=WHITE, fg=BLACK).pack(pady=10)
+        layout=QVBoxLayout(dialog); layout.setContentsMargins(40,25,40,25); layout.setSpacing(8)
 
-        box = tk.Frame(win, bg=WHITE)
-        box.pack(pady=10)
+        title=QLabel("Monthly Summary"); title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title.setStyleSheet(f"color:{BURGUNDY};font-size:30px;font-weight:bold;"); layout.addWidget(title)
 
-        for col, text in enumerate(["Category", "Budget", "Spent"]):
-            tk.Label(box, text=text, font=("Arial", 11, "bold"),
-                     bg=WHITE, fg=BLACK, width=18).grid(row=0, column=col, pady=5)
+        info=QLabel(
+            f"Month: {self.budget['month']}\n"
+            f"Total Budget: ₱{self.budget['total']:,.2f}\n"
+            f"Total Expenses: ₱{spent:,.2f}\n"
+            f"Remaining: ₱{left:,.2f}"
+        )
 
-        for row, category in enumerate(CATEGORIES, 1):
-            category_budget = self.budget["categories"].get(category, 0)
-            category_spent = sum(e["amount"] for e in self.expenses if e["category"] == category)
+        info.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        info.setStyleSheet(f"color:{BLACK};font-size:17px;padding:10px;")
+        layout.addWidget(info)
 
-            for col, value in enumerate([
-                category,
-                f"₱{category_budget:,.2f}",
-                f"₱{category_spent:,.2f}"
-            ]):
-                tk.Label(box, text=value, bg=WHITE, fg=BLACK,
-                         width=18).grid(row=row, column=col, pady=5)
+        table=QGridLayout(); table.setHorizontalSpacing(70); table.setVerticalSpacing(12)
 
-        overall = "Over Budget" if spent > budget else "Within Budget"
+        for column,text in enumerate(["Category","Budget","Spent"]):
+            label=QLabel(text); label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label.setStyleSheet(f"color:{BLACK};font-size:17px;font-weight:bold;")
+            table.addWidget(label,0,column)
 
-        tk.Label(win, text=overall, font=("Arial", 18, "bold"),
-                 bg=WHITE, fg=RED if spent > budget else BURGUNDY).pack(pady=20)
+        for row,category in enumerate(CATEGORIES,1):
+
+            category_label=QLabel(category)
+            budget_label=QLabel(f"₱{self.budget['categories'].get(category,0):,.2f}")
+            spent_label=QLabel(f"₱{data[category]:,.2f}")
+
+            for label in [category_label,budget_label,spent_label]:
+                label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                label.setStyleSheet(f"color:{BLACK};font-size:16px;")
+
+            table.addWidget(category_label,row,0)
+            table.addWidget(budget_label,row,1)
+            table.addWidget(spent_label,row,2)
+
+        layout.addLayout(table); layout.addStretch()
+
+        text=status(self.budget,spent)
+        color=RED if left<0 else BURGUNDY
+
+        status_label=QLabel(text); status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        status_label.setStyleSheet(f"color:{color};font-size:24px;font-weight:bold;padding:10px;")
+        layout.addWidget(status_label)
+
+        close=QPushButton("Close"); close.setFixedSize(200,42)
+        close.setStyleSheet(f"""
+        QPushButton {{
+            background:{WHITE};
+            color:{BLACK};
+            border:3px solid {BLACK};
+            font-size:16px;
+        }}
+        QPushButton:hover {{ background:#EEEEEE;color:{BLACK}; }}
+        """)
+        close.clicked.connect(dialog.close)
+        layout.addWidget(close,alignment=Qt.AlignmentFlag.AlignCenter)
+
+        dialog.exec()
 
     def logout(self):
-        if messagebox.askyesno("Logout", "Do you want to logout?"):
-            self.save()
-            self.login()
+
+        answer=QMessageBox.question(self,"Logout","Do you want to log out?")
+
+        if answer==QMessageBox.StandardButton.Yes:
+            self.save(); self.login()

@@ -1,149 +1,131 @@
-import tkinter as tk
-from tkinter import messagebox
-from .service import login, create_account
+from PyQt6.QtWidgets import QWidget,QVBoxLayout,QLabel,QLineEdit,QPushButton,QMessageBox
+from PyQt6.QtCore import Qt
+from .service import login,create_account
 
-BURGUNDY = "#800020"
-WHITE = "#FFFFFF"
-BLACK = "#000000"
-BG = "#F5F5F5"
+BURGUNDY="#900020"; BG="#F5F5F5"; WHITE="#FFFFFF"; BLACK="#000000"
 
 
-def show_login(root, success):
-    root.configure(bg=BG)
+def input_style():
+    return f"""
+    QLineEdit {{
+        background:{WHITE};
+        color:{BLACK};
+        border:3px solid {BLACK};
+        font-size:18px;
+        padding:5px;
+    }}
+    """
+
+
+def button_style():
+    return f"""
+    QPushButton {{
+        background:{BURGUNDY};
+        color:{WHITE};
+        border:3px solid {BURGUNDY};
+        font-size:18px;
+    }}
+    QPushButton:hover {{
+        background:#700018;
+        color:{WHITE};
+    }}
+    """
+
+
+def show_login(root,success):
 
     def clear():
-        for w in root.winfo_children():
-            w.destroy()
-
-    def label(parent, text, size=11, color=BLACK):
-        tk.Label(
-            parent,
-            text=text,
-            font=("Arial", size, "bold" if size > 20 else "normal"),
-            bg=parent.cget("bg"),
-            fg=color
-        ).pack(pady=5)
-
-    def button(parent, text, command):
-        tk.Button(
-            parent,
-            text=text,
-            command=command,
-            width=20,
-            bg=WHITE,
-            fg=BLACK,
-            activebackground=WHITE,
-            activeforeground=BLACK
-        ).pack(pady=5)
+        old=root.takeCentralWidget()
+        if old: old.deleteLater()
 
     def login_page():
+
         clear()
 
-        box = tk.Frame(
-            root,
-            bg=WHITE,
-            padx=40,
-            pady=30
-        )
-        box.pack(expand=True)
+        page=QWidget(); page.setStyleSheet(f"background:{BG};")
+        layout=QVBoxLayout(page); layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        label(box, "MyBudgetBuddy", 24, BURGUNDY)
-        label(box, "Username")
+        box=QWidget(); box.setFixedSize(500,480); box.setStyleSheet(f"background:{WHITE};")
+        form=QVBoxLayout(box); form.setContentsMargins(60,40,60,40); form.setSpacing(12)
 
-        username = tk.Entry(
-            box,
-            bg=WHITE,
-            fg=BLACK,
-            insertbackground=BLACK
-        )
-        username.pack(pady=5)
+        title=QLabel("MyBudgetBuddy"); title.setAlignment(Qt.AlignmentFlag.AlignCenter); title.setStyleSheet(f"color:{BURGUNDY};font-size:32px;font-weight:bold;"); form.addWidget(title)
 
-        label(box, "Password")
+        username_label=QLabel("Username"); username_label.setAlignment(Qt.AlignmentFlag.AlignCenter); username_label.setStyleSheet(f"color:{BLACK};font-size:20px;"); form.addWidget(username_label)
 
-        password = tk.Entry(
-            box,
-            show="*",
-            bg=WHITE,
-            fg=BLACK,
-            insertbackground=BLACK
-        )
-        password.pack(pady=5)
+        username=QLineEdit(); username.setFixedHeight(42); username.setStyleSheet(input_style()); form.addWidget(username)
+
+        password_label=QLabel("Password"); password_label.setAlignment(Qt.AlignmentFlag.AlignCenter); password_label.setStyleSheet(f"color:{BLACK};font-size:20px;"); form.addWidget(password_label)
+
+        password=QLineEdit(); password.setFixedHeight(42); password.setEchoMode(QLineEdit.EchoMode.Password); password.setStyleSheet(input_style()); form.addWidget(password)
+
+        form.addSpacing(15)
 
         def submit():
-            if login(username.get(), password.get()):
+            if login(username.text(),password.text()):
                 success()
             else:
-                messagebox.showerror(
-                    "Login",
-                    "Invalid username or password."
-                )
+                QMessageBox.warning(root,"Login","Invalid username or password.")
 
-        button(box, "Login", submit)
-        button(box, "Register", register_page)
+        login_button=QPushButton("Login"); login_button.setFixedHeight(42); login_button.setStyleSheet(button_style()); login_button.clicked.connect(submit); form.addWidget(login_button)
+
+        register_button=QPushButton("Register"); register_button.setFixedHeight(42); register_button.setStyleSheet(button_style()); register_button.clicked.connect(register_page); form.addWidget(register_button)
+
+        layout.addWidget(box); root.setCentralWidget(page)
 
     def register_page():
+
         clear()
 
-        box = tk.Frame(
-            root,
-            bg=WHITE,
-            padx=40,
-            pady=30
-        )
-        box.pack(expand=True)
+        page=QWidget(); page.setStyleSheet(f"background:{BG};")
+        layout=QVBoxLayout(page); layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        label(box, "Create Account", 22, BURGUNDY)
+        box=QWidget(); box.setFixedSize(500,540); box.setStyleSheet(f"background:{WHITE};")
+        form=QVBoxLayout(box); form.setContentsMargins(60,40,60,40); form.setSpacing(12)
 
-        entries = []
+        title=QLabel("Create Account"); title.setAlignment(Qt.AlignmentFlag.AlignCenter); title.setStyleSheet(f"color:{BURGUNDY};font-size:30px;font-weight:bold;"); form.addWidget(title)
 
-        for text in (
-            "Username",
-            "Password",
-            "Confirm Password"
-        ):
-            label(box, text)
+        username=QLineEdit(); password=QLineEdit(); confirm=QLineEdit()
 
-            e = tk.Entry(
-                box,
-                bg=WHITE,
-                fg=BLACK,
-                insertbackground=BLACK,
-                show="*" if "Password" in text else ""
-            )
-            e.pack(pady=5)
-            entries.append(e)
+        fields=[
+            ("Username",username),
+            ("Password",password),
+            ("Confirm Password",confirm)
+        ]
+
+        for text,entry in fields:
+
+            label=QLabel(text); label.setAlignment(Qt.AlignmentFlag.AlignCenter); label.setStyleSheet(f"color:{BLACK};font-size:20px;"); form.addWidget(label)
+
+            entry.setFixedHeight(42); entry.setStyleSheet(input_style())
+
+            if text!="Username":
+                entry.setEchoMode(QLineEdit.EchoMode.Password)
+
+            form.addWidget(entry)
+
+        form.addSpacing(15)
 
         def submit():
-            username, password, confirm = [
-                e.get() for e in entries
-            ]
 
-            if not username or not password:
-                messagebox.showwarning(
-                    "Register",
-                    "Please complete all fields."
-                )
+            user=username.text().strip(); pw=password.text(); conf=confirm.text()
 
-            elif password != confirm:
-                messagebox.showwarning(
-                    "Register",
-                    "Passwords do not match."
-                )
+            if not user or not pw:
+                QMessageBox.warning(root,"Register","Please complete all fields.")
 
-            elif create_account(username, password):
-                messagebox.showinfo(
-                    "Register",
-                    "Account created successfully."
-                )
+            elif pw!=conf:
+                QMessageBox.warning(root,"Register","Passwords do not match.")
+
+            elif create_account(user,pw):
+                QMessageBox.information(root,"Register","Account created successfully.")
                 login_page()
 
             else:
-                messagebox.showerror(
-                    "Register",
-                    "Username already exists."
-                )
+                QMessageBox.warning(root,"Register","Username already exists.")
 
-        button(box, "Create Account", submit)
-        button(box, "Back to Login", login_page)
+        create=QPushButton("Create Account"); create.setFixedHeight(42); create.setStyleSheet(button_style()); create.clicked.connect(submit); form.addWidget(create)
+
+        back=QPushButton("Back to Login"); back.setFixedHeight(42); back.setStyleSheet(button_style()); back.clicked.connect(login_page); form.addWidget(back)
+
+        layout.addWidget(box); root.setCentralWidget(page)
 
     login_page()

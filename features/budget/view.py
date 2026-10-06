@@ -1,163 +1,77 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
+from PyQt6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,QPushButton,QComboBox,QMessageBox
+from PyQt6.QtCore import Qt
 from .model import create_budget
 
-BURGUNDY = "#800020"
-WHITE = "#FFFFFF"
-BLACK = "#000000"
-BG = "#F5F5F5"
+BURGUNDY="#900020"; BG="#F5F5F5"; WHITE="#FFFFFF"; BLACK="#000000"
+MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"]
 
 
-def setup_budget(root, save, categories):
-    for w in root.winfo_children():
-        w.destroy()
+def field_style():
+    return f"""QLineEdit {{ background:{WHITE}; color:{BLACK}; border:3px solid {BLACK}; padding:4px; font-size:15px; }}"""
 
-    root.configure(bg=BG)
 
-    box = tk.Frame(
-        root,
-        bg=WHITE,
-        padx=30,
-        pady=20
-    )
-    box.pack(expand=True)
+def setup_budget(root,save,categories,budget=None):
 
-    tk.Label(
-        box,
-        text="Budget Period",
-        font=("Arial", 22, "bold"),
-        bg=WHITE,
-        fg=BURGUNDY
-    ).pack(pady=10)
+    page=QWidget(); page.setStyleSheet(f"background:{BG};color:{BLACK};")
+    layout=QVBoxLayout(page); layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    # Month
-    tk.Label(
-        box,
-        text="Month",
-        bg=WHITE,
-        fg=BLACK
-    ).pack()
+    box=QWidget(); box.setFixedSize(540,610); box.setStyleSheet(f"background:{WHITE};color:{BLACK};")
+    form=QVBoxLayout(box); form.setContentsMargins(40,25,40,25); form.setSpacing(5)
 
-    month = tk.StringVar(value="January")
+    title=QLabel("Budget Period"); title.setAlignment(Qt.AlignmentFlag.AlignCenter); title.setStyleSheet(f"color:{BURGUNDY};font-size:30px;font-weight:bold;"); form.addWidget(title)
 
-    ttk.Combobox(
-        box,
-        textvariable=month,
-        values=[
-            "January", "February", "March",
-            "April", "May", "June",
-            "July", "August", "September",
-            "October", "November", "December"
-        ],
-        state="readonly",
-        width=25
-    ).pack(pady=5)
+    month_label=QLabel("Month"); month_label.setAlignment(Qt.AlignmentFlag.AlignCenter); month_label.setStyleSheet(f"color:{BLACK};font-size:16px;"); form.addWidget(month_label)
 
-    # Year
-    tk.Label(
-        box,
-        text="Year",
-        bg=WHITE,
-        fg=BLACK
-    ).pack()
+    month=QComboBox(); month.addItems(MONTHS); month.setCurrentIndex(0); month.setFixedHeight(38)
+    month.setStyleSheet(f"""QComboBox {{ background:{WHITE}; color:{BLACK}; border:3px solid {BLACK}; padding:4px; font-size:15px; }} QComboBox QAbstractItemView {{ background:{WHITE}; color:{BLACK}; selection-background-color:{BURGUNDY}; selection-color:{WHITE}; }}""")
+    month.view().setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded); form.addWidget(month)
 
-    year = tk.Entry(
-        box,
-        bg=WHITE,
-        fg=BLACK,
-        insertbackground=BLACK,
-        width=28
-    )
-    year.pack(pady=5)
+    year_label=QLabel("Year"); year_label.setAlignment(Qt.AlignmentFlag.AlignCenter); year_label.setStyleSheet(f"color:{BLACK};font-size:16px;"); form.addWidget(year_label)
 
-    # Total budget
-    tk.Label(
-        box,
-        text="Total Monthly Budget",
-        bg=WHITE,
-        fg=BLACK
-    ).pack()
+    year=QLineEdit(); year.setFixedHeight(38); year.setPlaceholderText("Enter year"); year.setStyleSheet(field_style()); form.addWidget(year)
 
-    total = tk.Entry(
-        box,
-        bg=WHITE,
-        fg=BLACK,
-        insertbackground=BLACK,
-        width=28
-    )
-    total.pack(pady=5)
+    total_label=QLabel("Total Monthly Budget"); total_label.setAlignment(Qt.AlignmentFlag.AlignCenter); total_label.setStyleSheet(f"color:{BLACK};font-size:16px;"); form.addWidget(total_label)
 
-    # Category budgets
-    entries = {}
+    total=QLineEdit(); total.setFixedHeight(38); total.setPlaceholderText("Enter total budget"); total.setStyleSheet(field_style()); form.addWidget(total)
+
+    entries={}
 
     for category in categories:
-        row = tk.Frame(
-            box,
-            bg=WHITE
-        )
-        row.pack(pady=2)
-
-        tk.Label(
-            row,
-            text=category,
-            width=18,
-            anchor="w",
-            bg=WHITE,
-            fg=BLACK
-        ).pack(side="left")
-
-        entries[category] = tk.Entry(
-            row,
-            width=15,
-            bg=WHITE,
-            fg=BLACK,
-            insertbackground=BLACK
-        )
-        entries[category].pack(side="left")
+        row=QHBoxLayout(); row.setSpacing(15)
+        label=QLabel(category); label.setFixedWidth(210); label.setStyleSheet(f"color:{BLACK};font-size:15px;")
+        entry=QLineEdit(); entry.setFixedHeight(36); entry.setPlaceholderText("Amount"); entry.setStyleSheet(field_style())
+        entries[category]=entry; row.addWidget(label); row.addWidget(entry); form.addLayout(row)
 
     def submit():
+
+        if not year.text().strip():
+            QMessageBox.warning(root,"Budget Period","Please enter a year."); return
+
         try:
-            year_value = year.get().strip()
-            total_amount = float(total.get())
-
-            if (
-                len(year_value) != 4
-                or not year_value.isdigit()
-                or total_amount <= 0
-            ):
-                raise ValueError
-
-            amounts = {}
-
-            for category, entry in entries.items():
-                amount = float(entry.get() or 0)
-
-                if amount < 0:
-                    raise ValueError
-
-                amounts[category] = amount
-
-            save(
-                create_budget(
-                    f"{month.get()} {year_value}",
-                    total_amount,
-                    amounts
-                )
-            )
-
+            total_amount=float(total.text().strip())
+            if total_amount<=0: raise ValueError
         except ValueError:
-            messagebox.showwarning(
-                "Budget",
-                "Please enter a valid year and budget amount."
-            )
+            QMessageBox.warning(root,"Budget Period","Please enter a valid total monthly budget."); return
 
-    tk.Button(
-        box,
-        text="Save Budget",
-        command=submit,
-        bg=WHITE,
-        fg=BLACK,
-        activebackground=WHITE,
-        activeforeground=BLACK,
-        width=20
-    ).pack(pady=10)
+        category_amounts={}
+
+        for category,entry in entries.items():
+            value=entry.text().strip()
+
+            if not value:
+                QMessageBox.warning(root,"Budget Period",f"Please enter an amount for {category}."); return
+
+            try:
+                amount=float(value)
+                if amount<0: raise ValueError
+            except ValueError:
+                QMessageBox.warning(root,"Budget Period",f"Please enter a valid amount for {category}."); return
+
+            category_amounts[category]=amount
+
+        save(create_budget(f"{month.currentText()} {year.text().strip()}",total_amount,category_amounts))
+
+    button=QPushButton("Save Budget"); button.setFixedSize(310,42); button.setStyleSheet(f"""QPushButton {{ background:{WHITE}; color:{BLACK}; border:3px solid {BLACK}; font-size:16px; }} QPushButton:hover {{ background:#EEEEEE; color:{BLACK}; }}""")
+    button.clicked.connect(submit); form.addWidget(button,alignment=Qt.AlignmentFlag.AlignCenter)
+
+    layout.addWidget(box); root.setCentralWidget(page)
