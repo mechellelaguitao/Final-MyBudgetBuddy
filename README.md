@@ -151,52 +151,53 @@ The program uses a budgeting theme: burgundy and gold on a warm cream background
 ## Project Structure
 
 ```text
+## Project Structure
+
+```text
 MyBudgetBuddy/
-│
-├── main.py
-├── mybudgetbuddy.db
-│
-├── database/
-│   ├── __init__.py
-│   └── database.py
-│
-├── features/
-│   ├── __init__.py
-│   │
-│   ├── authentication/
-│   │   ├── __init__.py
-│   │   ├── model.py
-│   │   ├── repository.py
-│   │   ├── service.py
-│   │   └── view.py
-│   │
-│   ├── budget/
-│   │   ├── __init__.py
-│   │   ├── model.py
-│   │   ├── service.py
-│   │   └── view.py
-│   │
-│   ├── expenses/
-│   │   ├── __init__.py
-│   │   ├── model.py
-│   │   ├── repository.py
-│   │   ├── service.py
-│   │   └── view.py
-│   │
-│   └── dashboard/
-│       ├── __init__.py
-│       └── view.py
-│
-├── screenshots/
-│   ├── login.png
-│   ├── dashboard.png
-│   ├── budget-period.png
+├── README.md                       # Project documentation
+├── main.py                         # Main project entry point
+├── .gitignore                      # Files Git should ignore
+├── screenshots/                    # Application screenshots
 │   ├── add-expenses.png
-│   ├── view-expenses.png
+│   ├── budget-period.png
+│   ├── dashboard.png
+│   ├── delete-expenses.png
 │   ├── edit-expenses.png
-│   └── delete-expenses.png
-│
-└── README.md
+│   ├── login.png
+│   └── view-expenses.png
+└── mybudgetbuddy_qt/               # Main application package
+    ├── __init__.py               
+    ├── requirements.txt            # Required Python packages
+    ├── database/
+    │   ├── __init__.py
+    │   └── database.py             # Database operations
+    └── features/
+        ├── __init__.py
+        ├── authentication/         # Login and registration
+        │   ├── __init__.py
+        │   ├── model.py
+        │   ├── repository.py
+        │   ├── service.py
+        │   └── view.py
+        ├── budget/                 # Budget management
+        │   ├── __init__.py
+        │   ├── model.py
+        │   ├── repository.py
+        │   ├── service.py
+        │   └── view.py
+        ├── dashboard/              # Budget dashboard
+        │   ├── __init__.py
+        │   └── view.py
+        └── expenses/               # Expense management
+            ├── __init__.py
+            ├── model.py
+            ├── repository.py
+            ├── service.py
+            └── view.py
+```
+
+**Note:** The database file is created or managed locally and excluded from GitHub using `.gitignore`.
 ```
 
 ### File and Folder Description

@@ -1,7 +1,7 @@
+
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QPushButton, QFrame, QMessageBox, QDialog,
-    QScrollArea, QProgressBar
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QFrame, QMessageBox, QDialog, QScrollArea, QProgressBar
 )
 from PyQt6.QtCore import Qt
 
@@ -9,15 +9,10 @@ from database.database import load_user_data, save_user_data
 from features.authentication.view import show_login
 from features.budget.model import empty_budget
 from features.budget.view import setup_budget
-from features.budget.service import (
-    remaining, status, all_categories, ensure_categories, usage_ratio
-)
+from features.budget.service import remaining, status, all_categories, ensure_categories, usage_ratio
 from features.expenses.service import add_expense, total, category_totals
-from features.expenses.view import (
-    ExpenseFormDialog, ExpenseEditDialog, ExpenseListDialog
-)
+from features.expenses.view import ExpenseFormDialog, ExpenseEditDialog, ExpenseListDialog
 
-# ----- Theme: colors and styles used by this screen -----
 BURGUNDY = "#900020"
 GOLD = "#C9A227"
 CREAM = "#FFF9EC"
@@ -30,90 +25,46 @@ ORANGE = "#E08A00"
 GRAY = "#6B6B6B"
 LINE = "#D8D0BE"
 FONT = "'Georgia'"
+NUMBER_WIDTH = 105
+BAR_WIDTH = 90
 
 
 def usage_color(ratio):
     """Green = safe, orange = nearly used up, red = fully used / over."""
-    if ratio >= 1:
-        return RED
-    if ratio >= 0.8:
-        return ORANGE
-    return GREEN
+    return RED if ratio >= 1 else ORANGE if ratio >= 0.8 else GREEN
 
 
 def menu_button_style():
     return f"""
-        QPushButton {{
-            background:{WHITE};
-            color:{BLACK};
-            border:2px solid {BURGUNDY};
-            border-left:8px solid {BURGUNDY};
-            border-radius:8px;
-            font-family:{FONT};
-            font-size:16px;
-            text-align:left;
-            padding-left:14px;
-        }}
-        QPushButton:hover {{
-            background:{BURGUNDY};
-            color:{WHITE};
-            border-left:8px solid {GOLD};
-        }}
+        QPushButton {{ background:{WHITE}; color:{BLACK}; border:2px solid {BURGUNDY};
+            border-left:8px solid {BURGUNDY}; border-radius:8px; font-family:{FONT};
+            font-size:16px; text-align:left; padding-left:14px; }}
+        QPushButton:hover {{ background:{BURGUNDY}; color:{WHITE}; border-left:8px solid {GOLD}; }}
     """
 
 
 def scrollbar_style():
     return f"""
-        QScrollBar:vertical {{
-            background:#EFE8D8;
-            width:12px;
-            border-radius:6px;
-            margin:0;
-        }}
-        QScrollBar::handle:vertical {{
-            background:{BURGUNDY};
-            border-radius:6px;
-            min-height:30px;
-        }}
-        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
-            height:0;
-        }}
+        QScrollBar:vertical {{ background:#EFE8D8; width:12px; border-radius:6px; margin:0; }}
+        QScrollBar::handle:vertical {{ background:{BURGUNDY}; border-radius:6px; min-height:30px; }}
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height:0; }}
     """
 
 
 def scroll_style(background=CREAM, border=True):
     frame = f"1px solid {LINE}" if border else "none"
     return f"""
-        QScrollArea {{
-            border:{frame};
-            border-radius:8px;
-            background:{background};
-        }}
-        QWidget#holder {{
-            background:{background};
-        }}
+        QScrollArea {{ border:{frame}; border-radius:8px; background:{background}; }}
+        QWidget#holder {{ background:{background}; }}
         {scrollbar_style()}
     """
 
 
 def progress_style(color):
     return f"""
-        QProgressBar {{
-            background:#E8E0D0;
-            border:none;
-            border-radius:5px;
-        }}
-        QProgressBar::chunk {{
-            background:{color};
-            border-radius:5px;
-        }}
+        QProgressBar {{ background:#E8E0D0; border:none; border-radius:5px; }}
+        QProgressBar::chunk {{ background:{color}; border-radius:5px; }}
     """
-
-
-# Column widths of the summary table (kept in one place so the header,
-# the scrolling rows and the total row line up).
-NUMBER_WIDTH = 105
-BAR_WIDTH = 90
 
 
 def plain_label(text, size=15, bold=False, color=BLACK, align=None):
@@ -124,10 +75,8 @@ def plain_label(text, size=15, bold=False, color=BLACK, align=None):
         f"font-weight:{'bold' if bold else 'normal'};"
         "background:transparent;border:none;"
     )
-
     if align:
         label.setAlignment(align)
-
     return label
 
 
@@ -142,17 +91,13 @@ def progress_bar(ratio, height):
 
 
 class App(QMainWindow):
-
     def __init__(self):
         super().__init__()
-
         self.current_user = None
         self.budget = empty_budget()
         self.expenses = []
-
         self.setWindowTitle("MyBudgetBuddy")
         self.setFixedSize(1000, 700)
-
         self.login()
 
     def clear(self):
@@ -164,16 +109,9 @@ class App(QMainWindow):
         show_login(self, self.after_login)
 
     def after_login(self, user):
-        # Load only the data belonging to the logged-in account.
         self.current_user = user["username"]
-        self.budget, self.expenses = load_user_data(
-            self.current_user
-        )
-
-        if self.budget["month"]:
-            self.dashboard()
-        else:
-            self.budget_period()
+        self.budget, self.expenses = load_user_data(self.current_user)
+        self.dashboard() if self.budget["month"] else self.budget_period()
 
     def set_budget(self, budget):
         self.budget = budget
@@ -185,7 +123,6 @@ class App(QMainWindow):
         if self.budget["month"]:
             self.dashboard()
         else:
-            # First-time setup was cancelled: go back to the login screen.
             self.current_user = None
             self.budget = empty_budget()
             self.expenses = []
@@ -193,22 +130,15 @@ class App(QMainWindow):
 
     def save(self):
         if self.current_user:
-            save_user_data(
-                self.current_user, self.budget, self.expenses
-            )
+            save_user_data(self.current_user, self.budget, self.expenses)
 
     def categories(self):
         return all_categories(self.budget, self.expenses)
 
-    # ------------------------------------------------------------------
-    # Dashboard
-    # ------------------------------------------------------------------
     def dashboard(self):
         self.clear()
-
         page = QWidget()
         page.setStyleSheet(f"background:{BG};color:{BLACK};")
-
         main = QVBoxLayout(page)
         main.setContentsMargins(0, 0, 0, 0)
         main.setSpacing(8)
@@ -216,36 +146,24 @@ class App(QMainWindow):
         header = QFrame()
         header.setFixedHeight(115)
         header.setStyleSheet(f"background:{BURGUNDY};")
-
         header_layout = QHBoxLayout(header)
         header_layout.setContentsMargins(35, 0, 30, 0)
 
         title = QLabel("MyBudgetBuddy")
-        title.setStyleSheet(
-            f"color:{WHITE};font-size:32px;font-weight:bold;"
-        )
+        title.setStyleSheet(f"color:{WHITE};font-size:32px;font-weight:bold;")
         header_layout.addWidget(title)
         header_layout.addStretch()
 
         logout = QPushButton("Log out")
         logout.setFixedSize(250, 55)
         logout.setStyleSheet(f"""
-            QPushButton {{
-                background:{WHITE};
-                color:{BLACK};
-                border:3px solid {BLACK};
-                font-size:16px;
-            }}
-            QPushButton:hover {{
-                background:#EEEEEE;
-                color:{BLACK};
-            }}
+            QPushButton {{ background:{WHITE}; color:{BLACK}; border:3px solid {BLACK}; font-size:16px; }}
+            QPushButton:hover {{ background:#EEEEEE; color:{BLACK}; }}
         """)
         logout.clicked.connect(self.logout)
         header_layout.addWidget(logout)
         main.addWidget(header)
 
-        # Thin gold accent line under the header.
         accent = QFrame()
         accent.setFixedHeight(4)
         accent.setStyleSheet(f"background:{GOLD};")
@@ -253,43 +171,33 @@ class App(QMainWindow):
 
         heading = QLabel(f"{self.budget['month']} Dashboard")
         heading.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        heading.setStyleSheet(
-            f"color:{BLACK};font-size:38px;font-weight:bold;padding:8px;"
-        )
+        heading.setStyleSheet(f"color:{BLACK};font-size:38px;font-weight:bold;padding:8px;")
         main.addWidget(heading)
 
         spent = total(self.expenses)
         left = remaining(self.budget, spent)
-
         cards = QHBoxLayout()
         cards.setSpacing(25)
-        cards.addWidget(self.card("Budget", self.budget["total"]))
-        cards.addWidget(self.card("Expenses", spent))
-        cards.addWidget(self.card("Remaining", left))
+        for name, value in (("Budget", self.budget["total"]), ("Expenses", spent), ("Remaining", left)):
+            cards.addWidget(self.card(name, value))
         main.addLayout(cards)
 
         stat = QLabel(status(self.budget, spent))
         stat.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        stat.setStyleSheet(
-            f"color:{RED if left < 0 else BURGUNDY};"
-            "font-size:24px;font-weight:bold;padding:8px;"
-        )
+        stat.setStyleSheet(f"color:{RED if left < 0 else BURGUNDY};font-size:24px;font-weight:bold;padding:8px;")
         main.addWidget(stat)
 
-        # Lower part: options on the left, Monthly Summary on the right.
         body = QHBoxLayout()
         body.setContentsMargins(30, 4, 30, 18)
         body.setSpacing(25)
         body.addWidget(self.menu(), 0, Qt.AlignmentFlag.AlignTop)
         body.addWidget(self.summary_panel(spent, left), 1)
         main.addLayout(body, 1)
-
         self.setCentralWidget(page)
 
     def menu(self):
         menu_widget = QWidget()
         menu_widget.setFixedWidth(290)
-
         menu = QVBoxLayout(menu_widget)
         menu.setContentsMargins(0, 0, 0, 0)
         menu.setSpacing(8)
@@ -301,23 +209,18 @@ class App(QMainWindow):
             ("🗑️  Delete Expenses", self.delete),
             ("📅  Budget Period", self.budget_period)
         ]
-
         for text, command in buttons:
             button = QPushButton(text)
             button.setFixedSize(290, 46)
             button.setStyleSheet(menu_button_style())
             button.clicked.connect(command)
             menu.addWidget(button)
-
         return menu_widget
 
     def card(self, title, value):
         box = QFrame()
         box.setFixedSize(270, 115)
-        box.setStyleSheet(
-            f"background:{WHITE};color:{BLACK};border:1px solid {BLACK};"
-        )
-
+        box.setStyleSheet(f"background:{WHITE};color:{BLACK};border:1px solid {BLACK};")
         layout = QVBoxLayout(box)
 
         label = QLabel(title)
@@ -327,32 +230,19 @@ class App(QMainWindow):
 
         amount = QLabel(f"₱{value:,.2f}")
         amount.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        amount.setStyleSheet(
-            f"color:{BURGUNDY};font-size:25px;font-weight:bold;"
-        )
+        amount.setStyleSheet(f"color:{BURGUNDY};font-size:25px;font-weight:bold;")
         layout.addWidget(amount)
-
         return box
 
-    # ------------------------------------------------------------------
-    # Monthly Summary (shown directly on the dashboard)
-    # ------------------------------------------------------------------
     def summary_row(self, name, budget_text, spent_text, left_text,
                     bar=None, bold=False, left_color=BLACK, size=14):
         row = QHBoxLayout()
         row.setSpacing(6)
-
         row.addWidget(plain_label(name, size, bold), 1)
 
-        for text, color in (
-            (budget_text, BLACK),
-            (spent_text, BLACK),
-            (left_text, left_color)
-        ):
-            label = plain_label(
-                text, size, bold, color,
-                Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
-            )
+        for text, color in ((budget_text, BLACK), (spent_text, BLACK), (left_text, left_color)):
+            label = plain_label(text, size, bold, color,
+                                Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             label.setFixedWidth(NUMBER_WIDTH)
             row.addWidget(label)
 
@@ -363,7 +253,6 @@ class App(QMainWindow):
         else:
             bar.setFixedWidth(BAR_WIDTH)
             row.addWidget(bar)
-
         return row
 
     def summary_panel(self, spent, left):
@@ -372,60 +261,37 @@ class App(QMainWindow):
 
         panel = QFrame()
         panel.setObjectName("summary")
-        panel.setStyleSheet(
-            f"QFrame#summary {{ background:{CREAM};"
-            f"border:2px solid {BURGUNDY}; border-radius:12px; }}"
-        )
-
+        panel.setStyleSheet(f"QFrame#summary {{ background:{CREAM};border:2px solid {BURGUNDY};border-radius:12px; }}")
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(18, 10, 18, 10)
         layout.setSpacing(5)
 
         top = QHBoxLayout()
-        top.addWidget(
-            plain_label("📊 Monthly Summary", 20, True, BURGUNDY)
-        )
+        top.addWidget(plain_label("📊 Monthly Summary", 20, True, BURGUNDY))
         top.addStretch()
         top.addWidget(plain_label(self.budget["month"], 15, False, GRAY))
         layout.addLayout(top)
 
         ratio = usage_ratio(spent, self.budget["total"])
-
         used = QHBoxLayout()
         used.setSpacing(10)
         used.addWidget(progress_bar(ratio, 12), 1)
-        used.addWidget(
-            plain_label(
-                f"{ratio * 100:.0f}% of budget used", 14, True,
-                usage_color(ratio)
-            )
-        )
+        used.addWidget(plain_label(f"{ratio * 100:.0f}% of budget used", 14, True, usage_color(ratio)))
         layout.addLayout(used)
-
-        layout.addLayout(
-            self.summary_row(
-                "Category", "Budget", "Spent", "Left", bold=True, size=14
-            )
-        )
+        layout.addLayout(self.summary_row("Category", "Budget", "Spent", "Left", bold=True, size=14))
 
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(scroll_style("transparent", border=False))
-        scroll.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
-        )
-        scroll.setVerticalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAlwaysOn
-        )
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
 
         holder = QWidget()
         holder.setObjectName("holder")
-
         rows = QVBoxLayout(holder)
         rows.setAlignment(Qt.AlignmentFlag.AlignTop)
         rows.setContentsMargins(0, 0, 4, 0)
         rows.setSpacing(6)
-
         total_budget = 0
 
         for category in categories:
@@ -433,63 +299,36 @@ class App(QMainWindow):
             used_amount = data[category]
             category_left = budgeted - used_amount
             total_budget += budgeted
-
-            rows.addLayout(
-                self.summary_row(
-                    category,
-                    f"₱{budgeted:,.2f}",
-                    f"₱{used_amount:,.2f}",
-                    f"₱{category_left:,.2f}",
-                    bar=progress_bar(usage_ratio(used_amount, budgeted), 10),
-                    left_color=RED if category_left < 0 else BLACK
-                )
-            )
+            rows.addLayout(self.summary_row(
+                category, f"₱{budgeted:,.2f}", f"₱{used_amount:,.2f}",
+                f"₱{category_left:,.2f}",
+                bar=progress_bar(usage_ratio(used_amount, budgeted), 10),
+                left_color=RED if category_left < 0 else BLACK
+            ))
 
         if not categories:
-            rows.addWidget(
-                plain_label(
-                    "No categories yet. Open Budget Period to add some.",
-                    14, False, GRAY
-                )
-            )
+            rows.addWidget(plain_label("No categories yet. Open Budget Period to add some.", 14, False, GRAY))
 
         scroll.setWidget(holder)
         layout.addWidget(scroll, 1)
-
-        layout.addLayout(
-            self.summary_row(
-                "TOTAL",
-                f"₱{total_budget:,.2f}",
-                f"₱{spent:,.2f}",
-                f"₱{total_budget - spent:,.2f}",
-                bold=True,
-                left_color=RED if total_budget - spent < 0 else BLACK
-            )
-        )
-
+        layout.addLayout(self.summary_row(
+            "TOTAL", f"₱{total_budget:,.2f}", f"₱{spent:,.2f}",
+            f"₱{total_budget - spent:,.2f}", bold=True,
+            left_color=RED if total_budget - spent < 0 else BLACK
+        ))
         return panel
 
-    # ------------------------------------------------------------------
-    # Menu actions
-    # ------------------------------------------------------------------
     def has_expenses(self, title):
         if self.expenses:
             return True
-
-        QMessageBox.information(
-            self, title, "You don't have any expenses yet."
-        )
+        QMessageBox.information(self, title, "You don't have any expenses yet.")
         return False
 
     def add(self):
         dialog = ExpenseFormDialog(self, self.categories())
-
         if dialog.exec() == QDialog.DialogCode.Accepted:
             for description, category, amount in dialog.values():
-                add_expense(
-                    self.expenses, description, category, amount
-                )
-
+                add_expense(self.expenses, description, category, amount)
             ensure_categories(self.budget, self.expenses)
             self.save()
             self.dashboard()
@@ -504,60 +343,35 @@ class App(QMainWindow):
         self.open_expense_page("delete")
 
     def open_expense_page(self, action, index=None):
-        """Open the View / Edit / Delete page.
-
-        The Action icons inside those pages act as shortcuts: they close
-        the current page and ask for another one (optionally focused on
-        one expense), so this keeps opening pages until none is requested.
-        """
-        titles = {
-            "view": "View Expenses",
-            "edit": "Edit Expenses",
-            "delete": "Delete Expenses"
-        }
-
+        titles = {"view": "View Expenses", "edit": "Edit Expenses", "delete": "Delete Expenses"}
         if not self.has_expenses(titles[action]):
             return
 
         changed = False
-
         while action:
             categories = self.categories()
-
             if action == "edit":
-                dialog = ExpenseEditDialog(
-                    self, self.expenses, categories, focus_index=index
-                )
+                dialog = ExpenseEditDialog(self, self.expenses, categories, focus_index=index)
             else:
-                dialog = ExpenseListDialog(
-                    self, self.expenses, categories,
-                    mode=action, focus_index=index
-                )
+                dialog = ExpenseListDialog(self, self.expenses, categories, mode=action, focus_index=index)
 
             accepted = dialog.exec() == QDialog.DialogCode.Accepted
-
             if accepted and action in ("edit", "delete"):
                 self.expenses = dialog.result_expenses()
                 ensure_categories(self.budget, self.expenses)
                 self.save()
                 changed = True
-
             action, index = dialog.shortcut or (None, None)
 
         if changed:
             self.dashboard()
 
     def budget_period(self):
-        setup_budget(
-            self, self.set_budget, self.cancel_budget, self.budget,
-            {expense["category"] for expense in self.expenses}
-        )
+        setup_budget(self, self.set_budget, self.cancel_budget, self.budget,
+                     {expense["category"] for expense in self.expenses})
 
     def logout(self):
-        answer = QMessageBox.question(
-            self, "Logout", "Do you want to log out?"
-        )
-
+        answer = QMessageBox.question(self, "Logout", "Do you want to log out?")
         if answer == QMessageBox.StandardButton.Yes:
             self.save()
             self.current_user = None

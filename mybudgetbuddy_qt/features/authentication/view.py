@@ -1,15 +1,9 @@
-from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QLineEdit,
-    QPushButton, QMessageBox, QFormLayout, QFrame
-)
-from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect
-from PyQt6.QtCore import Qt
 
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox, QFormLayout, QFrame, QGraphicsDropShadowEffect
+from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt
 from .service import login, create_account
 
-
-# ----- Theme: colors and styles used by this screen -----
 BURGUNDY = "#900020"
 DARK_BURGUNDY = "#700018"
 BG = "#F5F5F5"
@@ -29,53 +23,20 @@ def add_shadow(widget, blur=18, offset=4):
 
 
 def button_style(kind="primary"):
-    # (background, text, border, hover background)
-    colors = {
-        "primary": (BURGUNDY, WHITE, BURGUNDY, DARK_BURGUNDY),
-        "secondary": (WHITE, BLACK, BLACK, LIGHT),
-    }
+    colors = {"primary": (BURGUNDY, WHITE, BURGUNDY, DARK_BURGUNDY), "secondary": (WHITE, BLACK, BLACK, LIGHT)}
     bg, fg, border, hover = colors[kind]
     return f"""
-        QPushButton {{
-            background:{bg};
-            color:{fg};
-            border:2px solid {border};
-            border-radius:8px;
-            font-family:{FONT};
-            font-size:15px;
-            font-weight:bold;
-            padding:6px 14px;
-        }}
-        QPushButton:hover {{
-            background:{hover};
-            color:{fg};
-        }}
-        QPushButton:disabled {{
-            background:#E4E0D6;
-            color:#9A9A9A;
-            border:2px solid #CFC9BA;
-        }}
+        QPushButton {{ background:{bg}; color:{fg}; border:2px solid {border}; border-radius:8px; font-family:{FONT}; font-size:15px; font-weight:bold; padding:6px 14px; }}
+        QPushButton:hover {{ background:{hover}; color:{fg}; }}
+        QPushButton:disabled {{ background:#E4E0D6; color:#9A9A9A; border:2px solid #CFC9BA; }}
     """
 
 
 def input_style(size=15):
     return f"""
-        QLineEdit {{
-            background:{WHITE};
-            color:{BLACK};
-            border:2px solid #B9B2A3;
-            border-radius:6px;
-            padding:4px 8px;
-            font-family:{FONT};
-            font-size:{size}px;
-        }}
-        QLineEdit:focus {{
-            border:2px solid {BURGUNDY};
-        }}
-        QLineEdit:read-only {{
-            background:#F1ECE1;
-            color:#444444;
-        }}
+        QLineEdit {{ background:{WHITE}; color:{BLACK}; border:2px solid #B9B2A3; border-radius:6px; padding:4px 8px; font-family:{FONT}; font-size:{size}px; }}
+        QLineEdit:focus {{ border:2px solid {BURGUNDY}; }}
+        QLineEdit:read-only {{ background:#F1ECE1; color:#444444; }}
     """
 
 
@@ -87,22 +48,16 @@ def show_login(root, success):
             old.deleteLater()
 
     def build_card(width, height, title_text, title_size):
-        """Create the page, the white card and the heading shared by
-        the login and register screens."""
         page = QWidget()
         page.setObjectName("page")
         page.setStyleSheet(f"QWidget#page {{ background-color: {BG}; }}")
-
         layout = QVBoxLayout(page)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         box = QFrame()
         box.setObjectName("card")
         box.setFixedSize(width, height)
-        box.setStyleSheet(
-            f"QFrame#card {{ background-color: {WHITE};"
-            f"border: 2px solid {BURGUNDY}; border-radius: 14px; }}"
-        )
+        box.setStyleSheet(f"QFrame#card {{ background-color: {WHITE}; border: 2px solid {BURGUNDY}; border-radius: 14px; }}")
         add_shadow(box)
 
         form = QVBoxLayout(box)
@@ -111,53 +66,33 @@ def show_login(root, success):
 
         coin = QLabel("💰")
         coin.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        coin.setStyleSheet(
-            "font-size: 40px; background: transparent; border: none;"
-        )
+        coin.setStyleSheet("font-size: 40px; background: transparent; border: none;")
         form.addWidget(coin)
 
         title = QLabel(title_text)
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet(
-            f"color: {BURGUNDY}; font-family: {FONT}; "
-            f"font-size: {title_size}px; font-weight: bold; "
-            "background: transparent; border: none;"
-        )
+        title.setStyleSheet(f"color: {BURGUNDY}; font-family: {FONT}; font-size: {title_size}px; font-weight: bold; background: transparent; border: none;")
         form.addWidget(title)
 
         tagline = QLabel("Plan it. Track it. Save it.")
         tagline.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        tagline.setStyleSheet(
-            f"color: {GRAY}; font-family: {FONT}; font-size: 15px; "
-            "font-style: italic; background: transparent; border: none;"
-        )
+        tagline.setStyleSheet(f"color: {GRAY}; font-family: {FONT}; font-size: 15px; font-style: italic; background: transparent; border: none;")
         form.addWidget(tagline)
         form.addSpacing(8)
-
         layout.addWidget(box)
         return page, form
 
     def field_label(text, width=None):
         label = QLabel(text)
-        label.setStyleSheet(
-            f"color: {BLACK}; font-family: {FONT}; font-size: 18px; "
-            "background: transparent; border: none;"
-        )
-
+        label.setStyleSheet(f"color: {BLACK}; font-family: {FONT}; font-size: 18px; background: transparent; border: none;")
         if width:
             label.setFixedWidth(width)
-            label.setAlignment(
-                Qt.AlignmentFlag.AlignRight |
-                Qt.AlignmentFlag.AlignVCenter
-            )
-
+            label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         return label
 
     def login_page():
         clear()
-
         page, form = build_card(600, 520, "MyBudgetBuddy", 32)
-
         fields = QFormLayout()
         fields.setHorizontalSpacing(15)
         fields.setVerticalSpacing(12)
@@ -180,13 +115,10 @@ def show_login(root, success):
 
         def submit():
             user = login(username.text().strip(), password.text())
-
             if user:
                 success(user)
             else:
-                QMessageBox.warning(
-                    root, "Login", "Invalid username or password."
-                )
+                QMessageBox.warning(root, "Login", "Invalid username or password.")
 
         password.returnPressed.connect(submit)
         username.returnPressed.connect(submit)
@@ -199,81 +131,53 @@ def show_login(root, success):
         login_button.setFixedSize(160, 44)
         login_button.setStyleSheet(button_style("primary"))
         login_button.clicked.connect(submit)
-        buttons.addWidget(
-            login_button,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        buttons.addWidget(login_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         register_button = QPushButton("Register")
         register_button.setFixedSize(160, 44)
         register_button.setStyleSheet(button_style("secondary"))
         register_button.clicked.connect(register_page)
-        buttons.addWidget(
-            register_button,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        buttons.addWidget(register_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         form.addLayout(buttons)
         form.addStretch()
-
         root.setCentralWidget(page)
 
     def register_page():
         clear()
-
         page, form = build_card(600, 600, "Create Account", 30)
 
         fields = QFormLayout()
-        fields.setHorizontalSpacing(15)
+        fields.setHorizontalSpacing(10)
         fields.setVerticalSpacing(12)
         fields.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         fields.setFormAlignment(Qt.AlignmentFlag.AlignHCenter)
 
-        username = QLineEdit()
-        password = QLineEdit()
-        confirm = QLineEdit()
-
-        entries = [
-            ("Username:", username, False),
-            ("Password:", password, True),
-            ("Confirm Password:", confirm, True)
-        ]
+        username, password, confirm = QLineEdit(), QLineEdit(), QLineEdit()
+        entries = [("Username:", username, False), ("Password:", password, True), ("Confirm Password:", confirm, True)]
 
         for text, entry, hidden in entries:
-            entry.setFixedWidth(300)
+            entry.setFixedWidth(285)
             entry.setFixedHeight(42)
             entry.setStyleSheet(input_style(18))
-
             if hidden:
                 entry.setEchoMode(QLineEdit.EchoMode.Password)
-
-            fields.addRow(field_label(text, 190), entry)
+            fields.addRow(field_label(text, 180), entry)
 
         form.addLayout(fields)
         form.addSpacing(10)
 
         def submit():
-            user = username.text().strip()
-            pw = password.text()
-            conf = confirm.text()
-
+            user, pw, conf = username.text().strip(), password.text(), confirm.text()
             if not user or not pw or not conf:
-                QMessageBox.warning(
-                    root, "Register", "Please complete all fields."
-                )
+                QMessageBox.warning(root, "Register", "Please complete all fields.")
             elif pw != conf:
-                QMessageBox.warning(
-                    root, "Register", "Passwords do not match."
-                )
+                QMessageBox.warning(root, "Register", "Passwords do not match.")
             elif create_account(user, pw):
-                QMessageBox.information(
-                    root, "Register", "Account created successfully."
-                )
+                QMessageBox.information(root, "Register", "Account created successfully.")
                 login_page()
             else:
-                QMessageBox.warning(
-                    root, "Register", "Username already exists."
-                )
+                QMessageBox.warning(root, "Register", "Username already exists.")
 
         confirm.returnPressed.connect(submit)
 
@@ -281,22 +185,15 @@ def show_login(root, success):
         create.setFixedSize(190, 44)
         create.setStyleSheet(button_style("primary"))
         create.clicked.connect(submit)
-        form.addWidget(
-            create,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        form.addWidget(create, alignment=Qt.AlignmentFlag.AlignCenter)
 
         back = QPushButton("Back to Login")
         back.setFixedSize(190, 44)
         back.setStyleSheet(button_style("secondary"))
         back.clicked.connect(login_page)
-        form.addWidget(
-            back,
-            alignment=Qt.AlignmentFlag.AlignCenter
-        )
+        form.addWidget(back, alignment=Qt.AlignmentFlag.AlignCenter)
 
         form.addStretch()
-
         root.setCentralWidget(page)
 
     login_page()
