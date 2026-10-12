@@ -514,6 +514,12 @@ The login system searches the users table to check whether the entered username 
 
 Shows the login interface where users can enter their username and password.
 
+### Register Account Screen
+
+![Register Account](screenshots/register-account.png)
+
+Shows the register account interface where users can enter their username, password, and confirm password to create an account.
+
 ### Dashboard
 
 ![Dashboard](screenshots/dashboard.png)
