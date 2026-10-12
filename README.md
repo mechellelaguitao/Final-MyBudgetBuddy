@@ -573,20 +573,20 @@ The system was tested by performing different actions in the application and che
 | Edit multiple expenses | Multiple changes should be saved | Passed |
 | Delete an expense | Selected expense should be removed | Passed |
 | Logout | User should return to login screen | Passed |
-| Monthly Summary on dashboard | Category budgets, spent, and left amounts are shown on the right side | _To be tested_ |
-| Add a new category in Budget Period | New category appears in the budget and in the summary | _To be tested_ |
-| Remove a category without expenses | Category is removed after Save | _To be tested_ |
-| Type a new category in Add Expenses | Expense is saved and the category appears in the summary | _To be tested_ |
-| Add many rows in Add Expenses | Page scrolls and all rows are saved | _To be tested_ |
-| Filter View Expenses by category | Only the chosen category is displayed | _To be tested_ |
-| Delete several expenses | Selected expenses are removed after Save | _To be tested_ |
-| Action icons in View Expenses | ✏️ opens Edit Expenses and 🗑️ opens Delete Expenses on the chosen expense | _To be tested_ |
-| Action icons in Edit Expenses | 👁️ opens View Expenses and 🗑️ opens Delete Expenses on the chosen expense | _To be tested_ |
-| Action icons in Delete Expenses | 👁️ opens View Expenses and ✏️ opens Edit Expenses on the chosen expense | _To be tested_ |
-| Click an Action icon with unsaved changes | A confirmation message appears before leaving the page | _To be tested_ |
-| Georgia font | All text in the program uses Georgia | _To be tested_ |
-| Cancel button | Unsaved changes are discarded | _To be tested_ |
-| Close with unsaved changes | A confirmation message appears | _To be tested_ |
+| Monthly Summary on dashboard | Category budgets, spent, and left amounts are shown on the right side | _Passed_ |
+| Add a new category in Budget Period | New category appears in the budget and in the summary | _Passed_ |
+| Remove a category without expenses | Category is removed after Save | _Passed_ |
+| Type a new category in Add Expenses | Expense is saved and the category appears in the summary | _Passed_ |
+| Add many rows in Add Expenses | Page scrolls and all rows are saved | _Passed_ |
+| Filter View Expenses by category | Only the chosen category is displayed | _Passed_ |
+| Delete several expenses | Selected expenses are removed after Save | _Passed_ |
+| Action icons in View Expenses | ✏️ opens Edit Expenses and 🗑️ opens Delete Expenses on the chosen expense | _Passed_ |
+| Action icons in Edit Expenses | 👁️ opens View Expenses and 🗑️ opens Delete Expenses on the chosen expense | _Passed_ |
+| Action icons in Delete Expenses | 👁️ opens View Expenses and ✏️ opens Edit Expenses on the chosen expense | _Passed_ |
+| Click an Action icon with unsaved changes | A confirmation message appears before leaving the page | _Passed_ |
+| Georgia font | All text in the program uses Georgia | _Passed_ |
+| Cancel button | Unsaved changes are discarded | _Passed_ |
+| Close with unsaved changes | A confirmation message appears | _Passed_ |
 
 ## Known Issues / Limitations
 
