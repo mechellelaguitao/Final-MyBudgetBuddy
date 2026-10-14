@@ -1,25 +1,14 @@
-
-from datetime import date
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox, QFrame, QScrollArea, QGraphicsDropShadowEffect
 from PyQt6.QtGui import QColor
 from PyQt6.QtCore import Qt, QTimer
-from .model import create_budget, empty_budget
+from .model import create_budget
 from .service import DEFAULT_CATEGORIES, allocated, clean_name, match_name, parse_amount
 
-BURGUNDY = "#900020"
-DARK_BURGUNDY = "#700018"
-GOLD = "#C9A227"
-CREAM = "#FFF9EC"
-BG = "#F5F5F5"
-WHITE = "#FFFFFF"
-BLACK = "#000000"
-RED = "#B42318"
-GREEN = "#2E7D32"
-GRAY = "#6B6B6B"
-LIGHT = "#EEEEEE"
-LINE = "#D8D0BE"
+BURGUNDY, DARK_BURGUNDY, GOLD, CREAM, BG, WHITE, BLACK = "#900020", "#700018", "#C9A227", "#FFF9EC", "#F5F5F5", "#FFFFFF", "#000000"
+RED, GREEN, GRAY, LIGHT, LINE = "#B42318", "#2E7D32", "#6B6B6B", "#EEEEEE", "#D8D0BE"
 FONT = "'Georgia'"
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+CENTER = Qt.AlignmentFlag.AlignCenter
 
 
 def add_shadow(widget, blur=18, offset=4):
@@ -31,8 +20,7 @@ def add_shadow(widget, blur=18, offset=4):
 
 
 def button_style(kind="primary"):
-    colors = {"primary": (BURGUNDY, WHITE, BURGUNDY, DARK_BURGUNDY), "secondary": (WHITE, BLACK, BLACK, LIGHT), "danger": (RED, WHITE, RED, "#8F1B12"), "gold": (GOLD, BLACK, GOLD, "#B08D1E")}
-    bg, fg, border, hover = colors[kind]
+    bg, fg, border, hover = {"primary": (BURGUNDY, WHITE, BURGUNDY, DARK_BURGUNDY), "secondary": (WHITE, BLACK, BLACK, LIGHT), "danger": (RED, WHITE, RED, "#8F1B12"), "gold": (GOLD, BLACK, GOLD, "#B08D1E")}[kind]
     return f"""
         QPushButton {{ background:{bg}; color:{fg}; border:2px solid {border}; border-radius:8px; font-family:{FONT}; font-size:15px; font-weight:bold; padding:6px 14px; }}
         QPushButton:hover {{ background:{hover}; color:{fg}; }}
@@ -65,12 +53,36 @@ def scrollbar_style():
 
 
 def scroll_style(background=CREAM, border=True):
-    frame = f"1px solid {LINE}" if border else "none"
     return f"""
-        QScrollArea {{ border:{frame}; border-radius:8px; background:{background}; }}
+        QScrollArea {{ border:{f"1px solid {LINE}" if border else "none"}; border-radius:8px; background:{background}; }}
         QWidget#holder {{ background:{background}; }}
         {scrollbar_style()}
     """
+
+
+def label(text, css, align=None):
+    widget = QLabel(text)
+    widget.setStyleSheet(f"{css}background:transparent;border:none;")
+    if align:
+        widget.setAlignment(align)
+    return widget
+
+
+def line_edit(text, height, placeholder):
+    entry = QLineEdit(text)
+    entry.setFixedHeight(height)
+    entry.setPlaceholderText(placeholder)
+    entry.setStyleSheet(input_style())
+    return entry
+
+
+def make_button(text, size, kind, command=None):
+    button = QPushButton(text)
+    button.setFixedSize(*size)
+    button.setStyleSheet(button_style(kind))
+    if command:
+        button.clicked.connect(command)
+    return button
 
 
 class CategoryRow(QFrame):
@@ -86,25 +98,17 @@ class CategoryRow(QFrame):
         layout.setContentsMargins(10, 6, 10, 6)
         layout.setSpacing(10)
 
-        self.name = QLineEdit(name)
-        self.name.setPlaceholderText("Category name")
-        self.name.setFixedHeight(36)
-        self.name.setStyleSheet(input_style())
+        self.name = line_edit(name, 36, "Category name")
         self.name.setReadOnly(locked_name)
         self.name.textChanged.connect(self.notify)
         layout.addWidget(self.name, 1)
 
-        self.amount = QLineEdit(amount)
-        self.amount.setPlaceholderText("Amount (₱)")
+        self.amount = line_edit(amount, 36, "Amount (₱)")
         self.amount.setFixedSize(160, 36)
-        self.amount.setStyleSheet(input_style())
         self.amount.textChanged.connect(self.notify)
         layout.addWidget(self.amount)
 
-        self.remove_button = QPushButton("✕")
-        self.remove_button.setFixedSize(36, 36)
-        self.remove_button.setStyleSheet(button_style("danger"))
-        self.remove_button.clicked.connect(self.remove)
+        self.remove_button = make_button("✕", (36, 36), "danger", self.remove)
         self.remove_button.setEnabled(removable)
         if not removable:
             self.remove_button.setToolTip("This category has expenses, so it can't be removed.")
@@ -122,23 +126,20 @@ class CategoryRow(QFrame):
 def column(label_text, widget):
     box = QVBoxLayout()
     box.setSpacing(4)
-    label = QLabel(label_text)
-    label.setStyleSheet(f"color:{BLACK};font-size:15px;font-weight:bold;background:transparent;border:none;")
-    box.addWidget(label)
+    box.addWidget(label(label_text, f"color:{BLACK};font-size:15px;font-weight:bold;"))
     box.addWidget(widget)
     return box
 
 
 def setup_budget(root, save, cancel, budget=None, used_categories=()):
-    """Show the Budget Period page."""
-    budget = budget or empty_budget()
+    """Show the Budget Period page (opens fresh: January, empty year, default categories)."""
     used = set(used_categories)
 
     page = QWidget()
     page.setObjectName("page")
     page.setStyleSheet(f"QWidget#page {{ background:{BG}; }}")
     layout = QVBoxLayout(page)
-    layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    layout.setAlignment(CENTER)
 
     box = QFrame()
     box.setObjectName("card")
@@ -149,54 +150,30 @@ def setup_budget(root, save, cancel, budget=None, used_categories=()):
     form = QVBoxLayout(box)
     form.setContentsMargins(35, 22, 35, 22)
     form.setSpacing(10)
-
-    title = QLabel("💰 Budget Period")
-    title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    title.setStyleSheet(f"color:{BURGUNDY};font-family:{FONT};font-size:30px;font-weight:bold;background:transparent;border:none;")
-    form.addWidget(title)
-
-    subtitle = QLabel("Set your monthly budget, then split it into your own categories.")
-    subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    subtitle.setStyleSheet(f"color:{GRAY};font-size:14px;background:transparent;border:none;")
-    form.addWidget(subtitle)
-
-    today = date.today()
-    month_name, _, year_text = budget["month"].partition(" ")
+    form.addWidget(label("💰 Budget Period", f"color:{BURGUNDY};font-family:{FONT};font-size:30px;font-weight:bold;", CENTER))
+    form.addWidget(label("Set your monthly budget, then split it into your own categories.", f"color:{GRAY};font-size:14px;", CENTER))
 
     month = QComboBox()
     month.addItems(MONTHS)
-    month.setFixedHeight(38)
+    month.setFixedSize(190, 38)
     month.setStyleSheet(combo_style())
-    month.setCurrentIndex(MONTHS.index(month_name) if month_name in MONTHS else today.month - 1)
+    month.setCurrentIndex(0)
 
-    year = QLineEdit(year_text.strip() or str(today.year))
-    year.setFixedHeight(38)
-    year.setPlaceholderText("Enter year")
-    year.setStyleSheet(input_style())
-
-    total = QLineEdit(f"{budget['total']:.2f}" if budget["total"] else "")
-    total.setFixedHeight(38)
-    total.setPlaceholderText("Enter total budget")
-    total.setStyleSheet(input_style())
+    year = line_edit("", 38, "Enter year")
+    year.setFixedWidth(110)
+    total = line_edit("", 38, "Enter total budget")
 
     top = QHBoxLayout()
     top.setSpacing(14)
-    month.setFixedWidth(190)
-    year.setFixedWidth(110)
     top.addLayout(column("Month", month))
     top.addLayout(column("Year", year))
     top.addLayout(column("Total Monthly Budget (₱)", total), 1)
     form.addLayout(top)
 
     category_header = QHBoxLayout()
-    category_title = QLabel("Category Budgets")
-    category_title.setStyleSheet(f"color:{BLACK};font-size:17px;font-weight:bold;background:transparent;border:none;")
-    category_header.addWidget(category_title)
+    category_header.addWidget(label("Category Budgets", f"color:{BLACK};font-size:17px;font-weight:bold;"))
     category_header.addStretch()
-
-    add_button = QPushButton("＋ Add Category")
-    add_button.setFixedSize(170, 36)
-    add_button.setStyleSheet(button_style("gold"))
+    add_button = make_button("＋ Add Category", (170, 36), "gold")
     category_header.addWidget(add_button)
     form.addLayout(category_header)
 
@@ -215,7 +192,7 @@ def setup_budget(root, save, cancel, budget=None, used_categories=()):
     form.addWidget(scroll, 1)
 
     allocation = QLabel("")
-    allocation.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    allocation.setAlignment(CENTER)
     form.addWidget(allocation)
     rows = []
 
@@ -254,12 +231,8 @@ def setup_budget(root, save, cancel, budget=None, used_categories=()):
     total.textChanged.connect(update_allocation)
     add_button.clicked.connect(new_category)
 
-    if budget["categories"]:
-        for name, amount in budget["categories"].items():
-            add_row(name, f"{amount:.2f}", existing=True)
-    else:
-        for name in DEFAULT_CATEGORIES:
-            add_row(name)
+    for name in DEFAULT_CATEGORIES:
+        add_row(name)
 
     def warn(text):
         QMessageBox.warning(root, "Budget Period", text)
@@ -304,19 +277,8 @@ def setup_budget(root, save, cancel, budget=None, used_categories=()):
     buttons = QHBoxLayout()
     buttons.setSpacing(14)
     buttons.addStretch()
-
-    cancel_button = QPushButton("Cancel")
-    cancel_button.setFixedSize(170, 44)
-    cancel_button.setStyleSheet(button_style("secondary"))
-    cancel_button.clicked.connect(cancel)
-    buttons.addWidget(cancel_button)
-
-    save_button = QPushButton("Save")
-    save_button.setFixedSize(170, 44)
-    save_button.setStyleSheet(button_style("primary"))
-    save_button.clicked.connect(submit)
-    buttons.addWidget(save_button)
-
+    buttons.addWidget(make_button("Cancel", (170, 44), "secondary", cancel))
+    buttons.addWidget(make_button("Save", (170, 44), "primary", submit))
     buttons.addStretch()
     form.addLayout(buttons)
     layout.addWidget(box)
