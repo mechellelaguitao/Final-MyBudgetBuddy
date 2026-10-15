@@ -22,21 +22,22 @@ The main objectives of MyBudgetBuddy are:
 
 ### User Login
 
-Users can log in using their username and password. Pressing **Enter** also submits the form.
+Users can log in using their username and password. Pressing **Enter** also submits the form. An error message is shown when the username or password is wrong.
 
 ### User Registration
 
-New users can create an account using the Register feature.
+New users can create an account using the **Register** button on the login screen. The form asks for a **Username**, **Password**, and **Confirm Password**. The account is only created when all fields are filled in, both passwords match, and the username is not already taken. **Back to Login** returns to the login screen.
 
 ### Dashboard
 
 The dashboard is the main screen of the system. It contains:
 
-- The **MyBudgetBuddy** title and the **Log out** button.
+- The **MyBudgetBuddy** title (with a 💵 icon beside it) and the **Log out** button.
+- The budget **month and year** as the dashboard heading (for example, *December 2026 Dashboard*).
 - Three cards showing the **Budget**, **Expenses**, and **Remaining** amounts.
 - The **budget status** message.
 - A **vertical menu on the left** with the buttons *Add Expenses*, *View Expenses*, *Edit Expenses*, *Delete Expenses*, and *Budget Period*.
-- The **Monthly Summary on the right**, which is always visible (there is no separate Monthly Summary button anymore).
+- The **Monthly Summary on the right**, which is always visible (there is no separate Monthly Summary button).
 
 ### Monthly Summary (on the Dashboard)
 
@@ -51,17 +52,17 @@ The progress bars change color to show how much has been used: green (safe), ora
 
 ### Budget Period
 
-Users can set their monthly budget and create their own categories:
+Users can set a monthly budget and create their own categories. The page always opens **fresh**, so a new month can be entered right away:
 
-- Choose the **month** and **year** (the current month and year are selected by default; the saved values are shown when editing).
-- Enter the **total monthly budget**.
-- **Add Category** adds a new category row with its own budget amount.
-- The **✕** button removes a category (categories that already have expenses cannot be removed).
+- Choose the **month** (January is selected by default) and type the **year** (the box starts empty).
+- Enter the **total monthly budget** (the box starts empty).
+- The category list starts with the suggested categories Food, Transportation, School, Bills, Personal, and Other, with empty amounts. Categories from a previous month are not carried over.
+- **＋ Add Category** adds a new category row with its own budget amount. Category names can be typed and changed freely.
+- The **✕** button removes a category.
 - The category list is **scrollable**, so any number of categories can be added.
-- A live label shows how much of the total budget has been allocated and how much is still unallocated (or over).
-- **Cancel** returns to the dashboard without saving. **Save** saves the budget.
-
-New accounts start with the suggested categories Food, Transportation, School, Bills, Personal, and Other, but these can be renamed, removed, or replaced.
+- A live label shows how much of the total budget has been allocated and how much is still unallocated (or over). If the categories add up to more than the total budget, the user is asked to confirm before saving.
+- **Save** saves the new budget period and returns to the dashboard, which shows the new month and year. **The expenses of the previous month are cleared**, so the new month starts with ₱0.00 spent and the user can record new expenses.
+- **Cancel** returns to the dashboard without saving and keeps the current budget and expenses. (On a brand-new account that has no budget yet, **Cancel** returns to the login screen.)
 
 ### Add Expenses
 
@@ -70,7 +71,7 @@ Users can add any number of expenses in one go:
 - Each row has a **Category**, **Description**, and **Amount**.
 - The category box is a drop-down list of the user's categories, and the user can also **type a new category**. New categories are added to the budget automatically (with a budget of ₱0.00 that can be changed in Budget Period).
 - **＋ Add Row** adds more rows, and **✕** removes a row. The page is scrollable.
-- Rows that are left completely empty are ignored.
+- Rows that have neither a description nor an amount are ignored.
 - **Cancel**, **Close**, and **Save** buttons (see *Dialog Buttons* below).
 
 ### View Expenses
@@ -90,11 +91,13 @@ An **Action** column beside the Amount has the icon buttons 👁️ (eye), which
 
 ### Delete Expenses
 
-Users can select one or more expenses in a scrollable table and click **Delete Selected**. A **Category filter** helps find the right expenses. The deletion is only kept after clicking **Save**. Includes **Cancel**, **Close**, and **Save** buttons.
+Users can select one or more expenses in a scrollable table and click **Delete Selected**. A **Category filter** helps find the right expenses. The user is asked to confirm with **Yes** or **No**, and after clicking **Yes** the selected expenses are deleted and saved right away (this cannot be undone). This page only has a **Close** button.
 
 An **Action** column beside the Amount has the icon buttons 👁️ (eye), which opens **View Expenses**, and ✏️ (write), which opens **Edit Expenses**, both focused on that expense.
 
 ### Dialog Buttons
+
+The **Add Expenses** and **Edit Expenses** windows have the following buttons. **View Expenses** and **Delete Expenses** only have a **Close** button.
 
 | Button | What it does |
 |---|---|
@@ -125,7 +128,14 @@ The system checks the user's spending and displays the current budget status:
 
 ### Design Theme
 
-The program uses a budgeting theme: burgundy and gold on a warm cream background, coin and chart icons, rounded cards, and progress bars that turn green, orange, or red depending on how much of a budget has been spent. All text in the program uses the **Georgia** font. The colors and styles are defined at the top of each `view.py` file, so the look of every screen can be changed in the file where that screen is written.
+The program uses a modern budgeting theme in burgundy and gold:
+
+- **Login and Register screens:** a burgundy gradient background with a white card, a gold border, and a 💵 badge on a burgundy gradient. The text boxes are cream and the buttons are rounded.
+- **Dashboard:** a burgundy gradient header, a soft warm background, rounded cards with a colored top edge (burgundy for Budget, gold for Expenses, green for Remaining), soft shadows, and a white Monthly Summary panel.
+- **Progress bars** turn green, orange, or red depending on how much of a budget has been spent.
+- **Fonts:** all text in the program uses the **Georgia** font. The only exception is the dashboard month and year heading, which uses **Freight Text** in semibold italic when that font is installed on the computer (otherwise it uses Georgia).
+
+The colors and styles are defined at the top of each `view.py` file, so the look of every screen can be changed in the file where that screen is written.
 
 ## Technologies Used
 
@@ -151,12 +161,11 @@ The program uses a budgeting theme: burgundy and gold on a warm cream background
 ## Project Structure
 
 ```text
-## Project Structure
-
-```text
 MyBudgetBuddy/
 ├── README.md                       # Project documentation
 ├── main.py                         # Main project entry point
+├── requirements.txt                # Required Python packages
+├── mybudgetbuddy.db                # SQLite database file
 ├── .gitignore                      # Files Git should ignore
 ├── screenshots/                    # Application screenshots
 │   ├── add-expenses.png
@@ -165,39 +174,34 @@ MyBudgetBuddy/
 │   ├── delete-expenses.png
 │   ├── edit-expenses.png
 │   ├── login.png
+│   ├── register-account.png
 │   └── view-expenses.png
-└── mybudgetbuddy_qt/               # Main application package
-    ├── __init__.py               
-    ├── requirements.txt            # Required Python packages
-    ├── database/
+├── database/
+│   ├── __init__.py
+│   └── database.py                 # Database operations
+└── features/
+    ├── __init__.py
+    ├── authentication/             # Login and registration
     │   ├── __init__.py
-    │   └── database.py             # Database operations
-    └── features/
+    │   ├── model.py
+    │   ├── repository.py
+    │   ├── service.py
+    │   └── view.py
+    ├── budget/                     # Budget management
+    │   ├── __init__.py
+    │   ├── model.py
+    │   ├── repository.py
+    │   ├── service.py
+    │   └── view.py
+    ├── dashboard/                  # Budget dashboard
+    │   ├── __init__.py
+    │   └── view.py
+    └── expenses/                   # Expense management
         ├── __init__.py
-        ├── authentication/         # Login and registration
-        │   ├── __init__.py
-        │   ├── model.py
-        │   ├── repository.py
-        │   ├── service.py
-        │   └── view.py
-        ├── budget/                 # Budget management
-        │   ├── __init__.py
-        │   ├── model.py
-        │   ├── repository.py
-        │   ├── service.py
-        │   └── view.py
-        ├── dashboard/              # Budget dashboard
-        │   ├── __init__.py
-        │   └── view.py
-        └── expenses/               # Expense management
-            ├── __init__.py
-            ├── model.py
-            ├── repository.py
-            ├── service.py
-            └── view.py
-```
-
-**Note:** The database file is created or managed locally and excluded from GitHub using `.gitignore`.
+        ├── model.py
+        ├── repository.py
+        ├── service.py
+        └── view.py
 ```
 
 ### File and Folder Description
@@ -206,13 +210,13 @@ MyBudgetBuddy/
 
 The main entry point of the application. It starts the PyQt6 application, sets Georgia as the font of the whole program, creates the database tables, and opens the login screen.
 
-**``**
+**`database`**
 
-Contains the files responsible for connecting to and managing the SQLite database.
+Contains the file responsible for connecting to and managing the SQLite database.
 
 **`database/database.py`**
 
-Creates the database tables (and the default `admin` account), and performs the main database saving and loading operations. Category budgets are loaded in the order the user entered them.
+Creates the database tables (and the default `admin` account), checks logins, registers users, and loads and saves each user's budget, category budgets, and expenses. Category budgets are loaded in the order the user entered them.
 
 **`features`**
 
@@ -232,7 +236,8 @@ Contains the login and registration functionality.
 Contains the budget functionality.
 
 - `model.py` - creates budget data.
-- `service.py` - calculates remaining budget, budget status, usage percentage, handles the dynamic category list, and provides the helpers `parse_amount` (checks and converts amount text), `clean_name` (trims category names), and `match_name` (finds a category ignoring uppercase/lowercase). The expenses feature also uses these helpers.
+- `repository.py` - contains the basic add, update, and delete helpers for a list of items.
+- `service.py` - calculates remaining budget, budget status, usage percentage, handles the dynamic category list and the default categories, and provides the helpers `parse_amount` (checks and converts amount text), `clean_name` (trims category names), and `match_name` (finds a category ignoring uppercase/lowercase). The expenses feature also uses these helpers.
 - `view.py` - displays the Budget Period interface with add/remove category rows, Cancel, and Save. Contains the colors and styles used by this screen.
 
 **`features/expenses`**
@@ -301,15 +306,15 @@ Username: admin
 Password: admin123
 ```
 
-Users can also click **Register** to create a new account.
+Users can also click **Register** to create a new account by entering a username, a password, and the same password again in **Confirm Password**.
 
 ### 2. Set the Budget
 
 After logging in for the first time, the **Budget Period** page opens automatically. It can also be opened later from the menu on the left of the dashboard.
 
-Select the month, enter the year and the total monthly budget, then fill in the amount for each category. Click **＋ Add Category** to create more categories, or **✕** to remove one.
+Select the month, type the year and the total monthly budget, then fill in the amount for each category. Click **＋ Add Category** to create more categories, or **✕** to remove one.
 
-Click **Save** to save the budget, or **Cancel** to go back without saving.
+Click **Save** to save the budget, or **Cancel** to go back without saving. Saving a new budget period clears the expenses of the previous month, so the dashboard starts the new month with no expenses.
 
 ### 3. Add Expenses
 
@@ -333,7 +338,7 @@ The existing expenses will be displayed with editable fields. Users can change m
 
 Click **Delete Expenses**.
 
-Select one or more expenses and click **Delete Selected**, then click **Save** to confirm the changes. Use 👁️ or ✏️ in the **Action** column to jump to viewing or editing that expense.
+Select one or more expenses and click **Delete Selected**, then click **Yes** to confirm. The expenses are deleted and saved right away. Use 👁️ or ✏️ in the **Action** column to jump to viewing or editing that expense.
 
 ### 7. Read the Monthly Summary
 
@@ -341,7 +346,7 @@ The Monthly Summary is always shown on the right side of the dashboard. It shows
 
 ### 8. Logout
 
-Click **Log out** to return to the login screen.
+Click **Log out** and confirm with **Yes** to return to the login screen.
 
 ## OOP Implementation
 
@@ -359,7 +364,7 @@ It controls the main application window and connects the different features such
 
 The `FormDialog` class in `features/expenses/view.py` inherits from `QDialog`.
 
-It is the base dialog for all expense windows. It builds the title banner, the scrollable body, and the **Cancel**, **Close**, and **Save** buttons.
+It is the base dialog for all expense windows. It builds the title banner, the scrollable body, and the **Cancel**, **Close**, and **Save** buttons (the View and Delete windows hide the buttons they do not need).
 
 **`ExpenseFormDialog`**
 
@@ -379,7 +384,7 @@ A helper in `features/expenses/view.py` that creates the 👁️ / ✏️ / 🗑
 
 **`ExpenseRow`** and **`CategoryRow`**
 
-Inherit from `QFrame`. Each one represents a single editable row (an expense or a category) and is created as many times as needed, which makes the categories dynamic.
+Inherit from `QFrame`. Each one represents a single editable row (an expense or a category) and is created as many times as needed, which makes the categories dynamic. `CategoryRow` is in `features/budget/view.py` and `ExpenseRow` is in `features/expenses/view.py`.
 
 ### Encapsulation
 
@@ -415,13 +420,13 @@ The three expense dialogs inherit the banner, the footer buttons, and the unsave
 
 ### Polymorphism
 
-Polymorphism is applied when each dialog overrides the same methods of `FormDialog` with its own behavior:
+Polymorphism is applied when the dialogs override the same methods of `FormDialog` with their own behavior:
 
-- `has_changes()` - checks if there is unsaved work.
-- `reset()` - restores the original values (used by **Cancel**).
-- `on_save()` - validates and saves (used by **Save**).
+- `has_changes()` - checks if there is unsaved work (overridden by all three dialogs).
+- `reset()` - restores the original values (used by **Cancel** in the Add and Edit dialogs).
+- `on_save()` - validates and saves (used by **Save** in the Add and Edit dialogs).
 
-The base class calls these methods without needing to know which dialog it is, so the same **Cancel**, **Close**, and **Save** buttons behave correctly in every window.
+The base class calls these methods without needing to know which dialog it is, so the same **Cancel**, **Close**, and **Save** buttons behave correctly in every window that shows them.
 
 ## Database
 
@@ -495,11 +500,11 @@ Reads the user's budget, category budgets, and expenses from the database when t
 
 **Update**
 
-Updates saved information when the user changes the budget or edits expenses.
+Updates saved information when the user changes the budget or edits expenses. When data is saved, the user's budget is updated and the saved category budgets and expenses are replaced with the current ones.
 
 **Delete**
 
-Removes expense records when the user deletes an expense and saves the changes.
+Removes expense records when the user deletes an expense, and removes the previous month's expenses and categories when a new budget period is saved.
 
 **Search**
 
@@ -531,7 +536,7 @@ Shows the main dashboard with the monthly budget, total expenses, remaining budg
 
 ![Budget Period](screenshots/budget-period.png)
 
-Shows the Budget Period interface where users can select a month, enter the monthly budget, and add or remove their own categories.
+Shows the Budget Period interface where users can select a month, type the year, enter the monthly budget, and add or remove their own categories.
 
 ### Add Expenses
 
@@ -575,25 +580,29 @@ The system was tested by performing different actions in the application and che
 | Logout | User should return to login screen | Passed |
 | Monthly Summary on dashboard | Category budgets, spent, and left amounts are shown on the right side | _Passed_ |
 | Add a new category in Budget Period | New category appears in the budget and in the summary | _Passed_ |
-| Remove a category without expenses | Category is removed after Save | _Passed_ |
+| Remove a category in Budget Period | Category is removed after Save | _Passed_ |
 | Type a new category in Add Expenses | Expense is saved and the category appears in the summary | _Passed_ |
 | Add many rows in Add Expenses | Page scrolls and all rows are saved | _Passed_ |
 | Filter View Expenses by category | Only the chosen category is displayed | _Passed_ |
-| Delete several expenses | Selected expenses are removed after Save | _Passed_ |
+| Delete several expenses | Selected expenses are removed after confirming with Yes | _Passed_ |
 | Action icons in View Expenses | ✏️ opens Edit Expenses and 🗑️ opens Delete Expenses on the chosen expense | _Passed_ |
 | Action icons in Edit Expenses | 👁️ opens View Expenses and 🗑️ opens Delete Expenses on the chosen expense | _Passed_ |
 | Action icons in Delete Expenses | 👁️ opens View Expenses and ✏️ opens Edit Expenses on the chosen expense | _Passed_ |
 | Click an Action icon with unsaved changes | A confirmation message appears before leaving the page | _Passed_ |
-| Georgia font | All text in the program uses Georgia | _Passed_ |
+| Georgia font | All text in the program uses Georgia (except the dashboard heading) | _Passed_ |
 | Cancel button | Unsaved changes are discarded | _Passed_ |
 | Close with unsaved changes | A confirmation message appears | _Passed_ |
+| Register with different passwords | Account is not created and a message is shown | _Passed_ |
+| Register with an existing username | Account is not created and a message is shown | _Passed_ |
+| Open Budget Period | Month is January, year and total are empty, default categories are listed | _Passed_ |
+| Save a new budget period | Dashboard shows the new month and the expenses are reset to ₱0.00 | _Passed_ |
+| Click No when deleting expenses | Expenses are kept | _Passed_ |
 
 ## Known Issues / Limitations
 
-- The system is designed as a simple college-level budgeting application.
+- The system is designed as a simple budgeting application.
 - User passwords are stored as plain text and are not encrypted.
-- The application currently supports one budget period at a time.
-- Category names of existing budget categories cannot be renamed (remove and re-add a category that has no expenses instead).
+- The application currently supports one budget period at a time. Saving a new budget period replaces the previous month's budget, categories, and expenses, and there is no history of past months.
 - The system does not have online or cloud database synchronization.
 - The application does not support multiple users using the application at the same time.
 - The system does not include advanced financial reports or charts.
