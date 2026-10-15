@@ -1,7 +1,8 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QFrame, QMessageBox, QDialog, QScrollArea, QProgressBar
+    QFrame, QMessageBox, QDialog, QScrollArea, QProgressBar, QGraphicsDropShadowEffect
 )
+from PyQt6.QtGui import QColor
 from PyQt6.QtCore import Qt
 
 from database.database import load_user_data, save_user_data
@@ -13,7 +14,7 @@ from features.expenses.service import add_expense, total, category_totals
 from features.expenses.view import ExpenseFormDialog, ExpenseEditDialog, ExpenseListDialog
 
 BURGUNDY, GOLD, CREAM, BG, WHITE, BLACK = "#900020", "#C9A227", "#FFF9EC", "#F5F5F5", "#FFFFFF", "#000000"
-RED, GREEN, ORANGE, GRAY, LINE = "#B42318", "#2E7D32", "#E08A00", "#6B6B6B", "#D8D0BE"
+RED, GREEN, ORANGE, GRAY, LINE, EDGE = "#B42318", "#2E7D32", "#E08A00", "#6B6B6B", "#D8D0BE", "#E8DFCB"
 FONT = "'Georgia'"
 NUMBER_WIDTH = 105
 BAR_WIDTH = 90
@@ -28,8 +29,8 @@ def usage_color(ratio):
 
 def menu_button_style():
     return f"""
-        QPushButton {{ background:{WHITE}; color:{BLACK}; border:2px solid {BURGUNDY}; border-left:8px solid {BURGUNDY}; border-radius:8px; font-family:{FONT}; font-size:16px; text-align:left; padding-left:14px; }}
-        QPushButton:hover {{ background:{BURGUNDY}; color:{WHITE}; border-left:8px solid {GOLD}; }}
+        QPushButton {{ background:{WHITE}; color:{BLACK}; border:1px solid {EDGE}; border-left:6px solid {BURGUNDY}; border-radius:12px; font-family:{FONT}; font-size:16px; text-align:left; padding-left:14px; }}
+        QPushButton:hover {{ background:{BURGUNDY}; color:{WHITE}; border-left:6px solid {GOLD}; }}
     """
 
 
@@ -66,9 +67,18 @@ def styled(text, css, align=None):
 
 def strip(height, color):
     frame = QFrame()
+    frame.setObjectName("strip")
     frame.setFixedHeight(height)
-    frame.setStyleSheet(f"background:{color};")
+    frame.setStyleSheet(f"QFrame#strip {{ background:{color}; }}")
     return frame
+
+
+def shadow(widget, blur=20, offset=4):
+    effect = QGraphicsDropShadowEffect()
+    effect.setBlurRadius(blur)
+    effect.setOffset(0, offset)
+    effect.setColor(QColor(0, 0, 0, 45))
+    widget.setGraphicsEffect(effect)
 
 
 def plain_label(text, size=15, bold=False, color=BLACK, align=None):
@@ -132,25 +142,28 @@ class App(QMainWindow):
     def dashboard(self):
         self.clear()
         page = QWidget()
-        page.setStyleSheet(f"background:{BG};color:{BLACK};")
+        page.setObjectName("page")
+        page.setStyleSheet(f"QWidget#page {{ background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 {BG}, stop:1 #EFE6D6); }}")
         main = QVBoxLayout(page)
         main.setContentsMargins(0, 0, 0, 0)
         main.setSpacing(8)
 
-        header = strip(115, BURGUNDY)
+        header = strip(115, f"qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 {BURGUNDY}, stop:1 #5E0014)")
         header_layout = QHBoxLayout(header)
         header_layout.setContentsMargins(35, 0, 30, 0)
-        header_layout.addWidget(styled("MyBudgetBuddy", f"color:{WHITE};font-size:32px;font-weight:bold;"))
+        header_layout.setSpacing(10)
+        header_layout.addWidget(styled("💵", "font-size:30px;"))
+        header_layout.addWidget(styled("MyBudgetBuddy", f"color:{WHITE};font-size:22px;font-weight:bold;"))
         header_layout.addStretch()
 
         logout = QPushButton("Log out")
-        logout.setFixedSize(250, 55)
-        logout.setStyleSheet(f"QPushButton {{ background:{WHITE}; color:{BLACK}; border:3px solid {BLACK}; font-size:16px; }} QPushButton:hover {{ background:#EEEEEE; color:{BLACK}; }}")
+        logout.setFixedSize(120, 40)
+        logout.setStyleSheet(f"QPushButton {{ background:{WHITE}; color:{BURGUNDY}; border:none; border-radius:20px; font-size:15px; font-weight:bold; }} QPushButton:hover {{ background:{CREAM}; color:{BURGUNDY}; }}")
         logout.clicked.connect(self.logout)
         header_layout.addWidget(logout)
         main.addWidget(header)
         main.addWidget(strip(4, GOLD))
-        main.addWidget(styled(f"{self.budget['month']} Dashboard", f"color:{BLACK};font-size:38px;font-weight:bold;padding:8px;", CENTER))
+        main.addWidget(styled(f"{self.budget['month']} Dashboard", f"color:{BLACK};font-family:'Freight Text Pro','Freight Text',Georgia,serif;font-size:38px;font-weight:600;font-style:italic;padding:8px;", CENTER))
 
         spent = total(self.expenses)
         left = remaining(self.budget, spent)
@@ -181,15 +194,19 @@ class App(QMainWindow):
             button.setFixedSize(290, 46)
             button.setStyleSheet(menu_button_style())
             button.clicked.connect(command)
+            shadow(button, 12, 2)
             menu.addWidget(button)
         return menu_widget
 
     def card(self, title, value):
         box = QFrame()
-        box.setFixedSize(270, 115)
-        box.setStyleSheet(f"background:{WHITE};color:{BLACK};border:1px solid {BLACK};")
+        box.setFixedSize(230, 95)
+        accent = {"Budget": BURGUNDY, "Expenses": GOLD, "Remaining": GREEN}.get(title, BURGUNDY)
+        box.setObjectName("stat")
+        box.setStyleSheet(f"QFrame#stat {{ background:{WHITE}; border:1px solid {EDGE}; border-top:5px solid {accent}; border-radius:14px; }}")
+        shadow(box)
         layout = QVBoxLayout(box)
-        layout.addWidget(styled(title, f"color:{BLACK};font-size:17px;", CENTER))
+        layout.addWidget(styled(title, f"color:{GRAY};font-size:16px;", CENTER))
         layout.addWidget(styled(f"₱{value:,.2f}", f"color:{BURGUNDY};font-size:25px;font-weight:bold;", CENTER))
         return box
 
@@ -214,7 +231,8 @@ class App(QMainWindow):
 
         panel = QFrame()
         panel.setObjectName("summary")
-        panel.setStyleSheet(f"QFrame#summary {{ background:{CREAM};border:2px solid {BURGUNDY};border-radius:12px; }}")
+        panel.setStyleSheet(f"QFrame#summary {{ background:{WHITE};border:1px solid {EDGE};border-radius:16px; }}")
+        shadow(panel, 24, 5)
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(18, 10, 18, 10)
         layout.setSpacing(5)
@@ -315,7 +333,7 @@ class App(QMainWindow):
         setup_budget(self, self.set_budget, self.cancel_budget, self.budget, {expense["category"] for expense in self.expenses})
 
     def logout(self):
-        if QMessageBox.question(self, "Logout", "Do you want to log out?") == QMessageBox.StandardButton.Yes:
+        if QMessageBox.question(self, "Log out", "Do you want to log out?") == QMessageBox.StandardButton.Yes:
             self.save()
             self.current_user, self.budget, self.expenses = None, empty_budget(), []
             self.login()

@@ -3,7 +3,7 @@ from PyQt6.QtGui import QColor
 from PyQt6.QtCore import Qt
 from .service import login, create_account
 
-BURGUNDY, DARK_BURGUNDY, BG, WHITE, BLACK, GRAY, LIGHT = "#900020", "#700018", "#F5F5F5", "#FFFFFF", "#000000", "#6B6B6B", "#EEEEEE"
+BURGUNDY, DARK_BURGUNDY, GOLD, CREAM, WHITE, BLACK, GRAY = "#900020", "#700018", "#C9A227", "#FFF9EC", "#FFFFFF", "#000000", "#6B6B6B"
 FONT = "'Georgia'"
 CENTER = Qt.AlignmentFlag.AlignCenter
 
@@ -17,9 +17,9 @@ def add_shadow(widget, blur=18, offset=4):
 
 
 def button_style(kind="primary"):
-    bg, fg, border, hover = {"primary": (BURGUNDY, WHITE, BURGUNDY, DARK_BURGUNDY), "secondary": (WHITE, BLACK, BLACK, LIGHT)}[kind]
+    bg, fg, border, hover = {"primary": (f"qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #B01030, stop:1 {BURGUNDY})", WHITE, BURGUNDY, DARK_BURGUNDY), "secondary": (WHITE, BURGUNDY, BURGUNDY, CREAM)}[kind]
     return f"""
-        QPushButton {{ background:{bg}; color:{fg}; border:2px solid {border}; border-radius:8px; font-family:{FONT}; font-size:15px; font-weight:bold; padding:6px 14px; }}
+        QPushButton {{ background:{bg}; color:{fg}; border:2px solid {border}; border-radius:22px; font-family:{FONT}; font-size:15px; font-weight:bold; padding:6px 14px; }}
         QPushButton:hover {{ background:{hover}; color:{fg}; }}
         QPushButton:disabled {{ background:#E4E0D6; color:#9A9A9A; border:2px solid #CFC9BA; }}
     """
@@ -27,8 +27,8 @@ def button_style(kind="primary"):
 
 def input_style(size=15):
     return f"""
-        QLineEdit {{ background:{WHITE}; color:{BLACK}; border:2px solid #B9B2A3; border-radius:6px; padding:4px 8px; font-family:{FONT}; font-size:{size}px; }}
-        QLineEdit:focus {{ border:2px solid {BURGUNDY}; }}
+        QLineEdit {{ background:{CREAM}; color:{BLACK}; border:2px solid #E3D3A0; border-radius:10px; padding:4px 10px; font-family:{FONT}; font-size:{size}px; }}
+        QLineEdit:focus {{ border:2px solid {BURGUNDY}; background:{WHITE}; }}
         QLineEdit:read-only {{ background:#F1ECE1; color:#444444; }}
     """
 
@@ -41,7 +41,7 @@ def make_label(text, css, align=CENTER):
 
 
 def field_label(text, width):
-    label = make_label(text, f"color: {BLACK}; font-family: {FONT}; font-size: 18px;", Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+    label = make_label(text, f"color: {BURGUNDY}; font-family: {FONT}; font-size: 18px; font-weight: bold;", Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
     label.setFixedWidth(width)
     return label
 
@@ -73,22 +73,27 @@ def show_login(root, success):
     def build_card(width, height, title_text, title_size):
         page = QWidget()
         page.setObjectName("page")
-        page.setStyleSheet(f"QWidget#page {{ background-color: {BG}; }}")
+        page.setStyleSheet(f"QWidget#page {{ background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 {BURGUNDY}, stop:0.6 #5E0014, stop:1 #2B000A); }}")
         layout = QVBoxLayout(page)
         layout.setAlignment(CENTER)
 
         box = QFrame()
         box.setObjectName("card")
         box.setFixedSize(width, height)
-        box.setStyleSheet(f"QFrame#card {{ background-color: {WHITE}; border: 2px solid {BURGUNDY}; border-radius: 14px; }}")
-        add_shadow(box)
+        box.setStyleSheet(f"QFrame#card {{ background-color: {WHITE}; border: 3px solid {GOLD}; border-radius: 20px; }}")
+        add_shadow(box, 40, 10)
 
         form = QVBoxLayout(box)
         form.setContentsMargins(55, 28, 55, 28)
         form.setSpacing(10)
-        form.addWidget(make_label("💰", "font-size: 40px;"))
+        coin = QLabel("💵")
+        coin.setAlignment(CENTER)
+        coin.setFixedSize(76, 76)
+        coin.setStyleSheet(f"background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #C2183F, stop:1 {DARK_BURGUNDY}); border: 3px solid {GOLD}; border-radius: 22px; font-size: 36px;")
+        add_shadow(coin, 20, 6)
+        form.addWidget(coin, alignment=CENTER)
         form.addWidget(make_label(title_text, f"color: {BURGUNDY}; font-family: {FONT}; font-size: {title_size}px; font-weight: bold;"))
-        form.addWidget(make_label("Plan it. Track it. Save it.", f"color: {GRAY}; font-family: {FONT}; font-size: 15px; font-style: italic;"))
+        form.addWidget(make_label("Plan it. Track it. Save it.", f"color: #9A7B1C; font-family: {FONT}; font-size: 15px; font-style: italic;"))
         form.addSpacing(8)
         layout.addWidget(box)
         return page, form
