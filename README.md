@@ -179,8 +179,8 @@ MyBudgetBuddy/
     ├── __init__.py 
     ├── requirements.txt            # Required Python packages
     ├── database/
-    │    ├── __init__.py
-    │    └── database.py            # Database operations
+    │   ├── __init__.py
+    │   └── database.py            # Database operations
     └── features/ 
         ├── __init__.py   
         ├── authentication/         # Login and registration
