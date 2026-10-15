@@ -180,7 +180,7 @@ MyBudgetBuddy/
     ├── requirements.txt            # Required Python packages
     ├── database/
     │   ├── __init__.py
-    │   └── database.py            # Database operations
+    │   └── database.py             # Database operations
     └── features/ 
         ├── __init__.py   
         ├── authentication/         # Login and registration
@@ -567,37 +567,37 @@ Shows the table where expenses are selected for deletion, with the view and edit
 
 The system was tested by performing different actions in the application and checking whether the expected results matched the actual results.
 
-| Test | Expected Result | Actual Result |
-|---|---|---------------|
-| Login with correct account | User enters the system | Passed        |
-| Login with incorrect password | Login should be rejected | Passed        |
-| Register a new account | New account should be created | Passed        |
-| Set monthly budget | Budget should be saved | Passed        |
-| Add an expense | Expense should appear in View Expenses | Passed        |
-| View expenses | Saved expenses should be displayed | Passed        |
-| Edit an expense | Updated information should appear | Passed        |
-| Edit multiple expenses | Multiple changes should be saved | Passed        |
-| Delete an expense | Selected expense should be removed | Passed        |
-| Logout | User should return to login screen | Passed        |
-| Monthly Summary on dashboard | Category budgets, spent, and left amounts are shown on the right side | _Passed_      |
-| Add a new category in Budget Period | New category appears in the budget and in the summary | _Passed_      |
-| Remove a category in Budget Period | Category is removed after Save | _Passed_      |
-| Type a new category in Add Expenses | Expense is saved and the category appears in the summary | _Passed_      |
-| Add many rows in Add Expenses | Page scrolls and all rows are saved | _Passed_      |
-| Filter View Expenses by category | Only the chosen category is displayed | _Passed_      |
-| Delete several expenses | Selected expenses are removed after confirming with Yes | _Passed_      |
-| Action icons in View Expenses | ✏️ opens Edit Expenses and 🗑️ opens Delete Expenses on the chosen expense | _Passed_      |
-| Action icons in Edit Expenses | 👁️ opens View Expenses and 🗑️ opens Delete Expenses on the chosen expense | _Passed_      |
-| Action icons in Delete Expenses | 👁️ opens View Expenses and ✏️ opens Edit Expenses on the chosen expense | _Passed_      |
-| Click an Action icon with unsaved changes | A confirmation message appears before leaving the page | _Passed_      |
-| Georgia font | All text in the program uses Georgia (except the dashboard heading) | _Passed_      |
-| Cancel button | Unsaved changes are discarded | _Passed_      |
-| Close with unsaved changes | A confirmation message appears | _Passed_      |
-| Register with different passwords | Account is not created and a message is shown | _Passed_      |
-| Register with an existing username | Account is not created and a message is shown | _Passed_      |
-| Open Budget Period | Month is January, year and total are empty, default categories are listed | _Passed_      |
-| Save a new budget period | Dashboard shows the new month and the expenses are reset to ₱0.00 | _Passed_      |
-| Click No when deleting expenses | Expenses are kept | _Passed_      |
+| Test                                      | Expected Result                                                           | Actual Result |
+|-------------------------------------------|---------------------------------------------------------------------------|--------|
+| Login with correct account                | User enters the system                                                    | Passed |
+| Login with incorrect password             | Login should be rejected                                                  | Passed |
+| Register a new account                    | New account should be created                                             | Passed |
+| Set monthly budget                        | Budget should be saved                                                    | Passed |
+| Add an expense                            | Expense should appear in View Expenses                                    | Passed |
+| View expenses                             | Saved expenses should be displayed                                        | Passed |
+| Edit an expense                           | Updated information should appear                                         | Passed |
+| Edit multiple expenses                    | Multiple changes should be saved                                          | Passed |
+| Delete an expense                         | Selected expense should be removed                                        | Passed |
+| Logout                                    | User should return to login screen                                        | Passed |
+| Monthly Summary on dashboard              | Category budgets, spent, and left amounts are shown on the right side     | Passed |
+| Add a new category in Budget Period       | New category appears in the budget and in the summary                     | Passed |
+| Remove a category in Budget Period        | Category is removed after Save                                            | Passed |
+| Type a new category in Add Expenses       | Expense is saved and the category appears in the summary                  | Passed |
+| Add many rows in Add Expenses             | Page scrolls and all rows are saved                                       | Passed |
+| Filter View Expenses by category          | Only the chosen category is displayed                                     | Passed |
+| Delete several expenses                   | Selected expenses are removed after confirming with Yes                   | Passed |
+| Action icons in View Expenses             | ✏️ opens Edit Expenses and 🗑️ opens Delete Expenses on the chosen expense | Passed |
+| Action icons in Edit Expenses             | 👁️ opens View Expenses and 🗑️ opens Delete Expenses on the chosen expense | Passed |
+| Action icons in Delete Expenses           | 👁️ opens View Expenses and ✏️ opens Edit Expenses on the chosen expense   | Passed |
+| Click an Action icon with unsaved changes | A confirmation message appears before leaving the page                    | Passed |
+| Georgia font                              | All text in the program uses Georgia (except the dashboard heading)       | Passed |
+| Cancel button                             | Unsaved changes are discarded                                             | Passed |
+| Close with unsaved changes                | A confirmation message appears                                            | Passed |
+| Register with different passwords         | Account is not created and a message is shown                             | Passed |
+| Register with an existing username        | Account is not created and a message is shown                             | Passed |
+| Open Budget Period                        | Month is January, year and total are empty, default categories are listed | Passed |
+| Save a new budget period                  | Dashboard shows the new month and the expenses are reset to ₱0.00         | Passed |
+| Click No when deleting expenses           | Expenses are kept                                                         | Passed |
 
 ## Known Issues / Limitations
 
