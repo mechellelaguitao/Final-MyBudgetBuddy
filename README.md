@@ -613,4 +613,4 @@ The system was tested by performing different actions in the application and che
 
 **Name:** Mechelle Laguitao
 
-**Section:** CS26(3581) BSCS-2
+**Section:** CS26(3581) BSCS 2
